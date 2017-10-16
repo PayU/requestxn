@@ -1,5 +1,5 @@
 {
-  "name": "reqtry",
+  "name": "retquest",
   "version": "0.0.1",
   "description": "request-promise-native wrapper with retries",
   "main": "index.js",

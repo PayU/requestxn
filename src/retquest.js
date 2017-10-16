@@ -25,11 +25,7 @@ module.exports = function sendRequest(request, uri, options) {
             });
     }, retryOptions)
         .then((response) => buildResponse(originalRequestOptions, response, errors))
-        .catch((error) => {
-            error.retries = errors.length;
-            error.errors = errors;
-            throw error;
-        });
+        .catch((error) => buildAndThrowError(error, errors));
 };
 
 function handleResponse(retryOptions, response) {
@@ -54,6 +50,12 @@ function buildResponse(originalRequestOptions, response, errors) {
     } else {
         return response.body;
     }
+}
+
+function buildAndThrowError(error, errors) {
+    error.retries = errors.length;
+    error.errors = errors;
+    throw error;
 }
 
 function getRequestOptions(uri, options) {

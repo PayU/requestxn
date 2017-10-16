@@ -85,11 +85,10 @@ describe('When sending get request with retries', function () {
 //     });
 // });
 describe.only('', function () {
-    let agent;;
+    let agent; ;
     before(function () {
         agent = new Http.Agent({
-            keepAlive: true,
-            keepAliveMsecs: 100
+            keepAlive: true
         });
     });
     it('dasd', function() {
@@ -97,7 +96,7 @@ describe.only('', function () {
             retry: {
                 retry5xx: true,
                 max: 2,
-                backoffBase: 3000
+                backoffBase: 2000
             }
         });
         return reqtry.post({
@@ -114,11 +113,11 @@ describe.only('', function () {
                 console.info(response.body);
                 console.info(response.retries);
             })
-            .catch(() => Promise.delay(10000))
+            .catch(() => Promise.delay(8000))
             .then(() => reqtry.post({
                 url: 'http://www.google.com',
                 resolveWithFullResponse: true,
-                // agent: agent,
+                agent: agent,
                 retry: {
                     max: 1,
                     stam: 5

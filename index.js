@@ -1,5 +1,5 @@
 let rp = require('request-promise-native');
-var reqtry = require('./src/reqtry');
+var rq = require('./src/retquest');
 var configuration = require('./src/configuration');
 
 module.exports.defaults = function (options) {
@@ -8,23 +8,23 @@ module.exports.defaults = function (options) {
 };
 
 module.exports.get = function () {
-    return reqtry(rp.get, ...arguments);
+    return rq(rp.get, ...arguments);
 };
 module.exports.post = function () {
-    return reqtry(rp.post, ...arguments);
+    return rq(rp.post, ...arguments);
 };
 module.exports.delete = function () {
-    return reqtry(rp.delete, ...arguments);
+    return rq(rp.delete, ...arguments);
 };
 module.exports.put = function () {
-    return reqtry(rp.put, ...arguments);
+    return rq(rp.put, ...arguments);
 };
 module.exports.patch = function () {
-    return reqtry(rp.patch, ...arguments);
+    return rq(rp.patch, ...arguments);
 };
 module.exports.head = function () {
-    return reqtry(rp.head, ...arguments);
+    return rq(rp.head, ...arguments);
 };
 module.exports.options = function () {
-    return reqtry(rp.options, ...arguments);
+    return rq(rp.options, ...arguments);
 };
