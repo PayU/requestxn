@@ -1,0 +1,34 @@
+{
+  "name": "request-promise-retry",
+  "version": "0.0.1",
+  "description": "request-promise wrapper with retries",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "request",
+    "request-promise",
+    "promise",
+    "retry"
+  ],
+  "author": "Kobi Carmeli",
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "request": "^2.83.0",
+    "request-promise-native": "^1.0.5",
+    "retry-as-promised": "^2.3.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.7.2",
+    "eslint-config-standard": "^10.2.1",
+    "eslint-plugin-import": "^2.7.0",
+    "eslint-plugin-node": "^5.1.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
+    "sinon": "^4.0.1",
+    "mocha": "^4.0.1",
+    "should": "^13.1.2"
+  }
+}
