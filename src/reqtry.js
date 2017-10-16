@@ -47,7 +47,7 @@ function handleResponse(retryOptions, response) {
 function buildResponse(originalRequestOptions, response, errors) {
     response.errors = errors;
     response.retries = response.errors.length;
-    if (originalRequestOptions.simple === undefined || (originalRequestOptions.simple && response.statusCode >= 400)) {
+    if ((originalRequestOptions.simple === undefined || originalRequestOptions.simple) && response.statusCode >= 400) {
         throw new StatusCodeError(response);
     } else if (originalRequestOptions.resolveWithFullResponse) {
         return response;
