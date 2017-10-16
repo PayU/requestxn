@@ -1,5 +1,5 @@
 let rpRetry = require('../index');
-let rp = require('request-promise');
+let rp = require('request-promise-native');
 let sinon = require('sinon');
 let should = require('should');
 
