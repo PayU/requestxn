@@ -1,17 +1,5 @@
 'use strict';
 
-// class StatusCodeError extends Error {
-//     constructor (response) {
-//         super();
-//         Error.captureStackTrace(this, this.constructor);
-//         this.name = this.constructor.name;
-//         var body = response.body && typeof response.body.toString === 'function' ? response.body.toString().replace(/\n/g, '\\n') : response.body;
-//         this.message = `${response.statusCode} - "${body}"`;
-//     }
-// }
-
-// module.exports = StatusCodeError;
-
 module.exports = class StatusCodeError extends Error {
     constructor (response, status) {
         // Calling parent constructor of base Error class.

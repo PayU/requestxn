@@ -1,7 +1,7 @@
 {
-  "name": "request-promise-retry",
+  "name": "reqtry",
   "version": "0.0.1",
-  "description": "request-promise wrapper with retries",
+  "description": "request-promise-native wrapper with retries",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,14 +21,15 @@
     "retry-as-promised": "^2.3.1"
   },
   "devDependencies": {
+    "bluebird": "^3.5.1",
     "eslint": "^4.7.2",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "sinon": "^4.0.1",
     "mocha": "^4.0.1",
-    "should": "^13.1.2"
+    "should": "^13.1.2",
+    "sinon": "^4.0.1"
   }
 }

@@ -1,0 +1,20 @@
+{
+    "env": {
+        "mocha": true,
+        "node": true
+    },
+    "extends": "standard",
+    "rules": {
+        "eol-last": "off",
+        "space-before-function-paren": "off",
+        "indent": ["error", 4],
+        "quotes": ["error", "single", { "avoidEscape": true }],
+        "semi": ["error", "always",{ "omitLastInOneLineBlock": true}],
+        "one-var": ["off"],
+        "camelcase": ["off"],
+        "no-unused-vars": ["error"],
+        "space-before-blocks": ["error"],
+        "no-multiple-empty-lines": ["error",{"max":1}],
+        "key-spacing": ["error"]
+    }
+}
