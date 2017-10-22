@@ -1,4 +1,4 @@
-# request-again
+# request-repeat
 
 <!-- [![NPM Version][npm-image]][npm-url]
 [![NPM Downloads][downloads-image]][downloads-url]
@@ -7,7 +7,7 @@ Wraps both request-promise-native and retry-as-promised together, in order to pr
 
 #### Example
 ```js
-var ra = require('request-again');
+var rr = require('request-repeat');
 
 var options = {
   url: 'http://www.site-with-issues.com',
@@ -32,7 +32,7 @@ var options = {
 
 #### Result
 ```js
-> ra.post(options).then()...
+> rr.post(options).then()...
 - "Request to http://www.site-with-issues.com failed on the 1 attempt with RequestError: Error: getaddrinfo ENOTFOUND www.site-with-issues.com www.site-with-issues.com:80"
 - "Request to http://www.site-with-issues.com failed on the 2 attempt with RequestError: Error: getaddrinfo ENOTFOUND www.site-with-issues.com www.site-with-issues.com:80"
 - "Got status-code 200 on request to http://www.site-with-issues.com"
@@ -40,9 +40,9 @@ var options = {
 
 #### Using above example with defaults
 ```js
-var ra = require('request-again');
+var rr = require('request-repeat');
 
-var rai = ra.defaults({
+var rri = rr.defaults({
   json: true,
   retry: {
     max: 3,
@@ -60,14 +60,14 @@ var rai = ra.defaults({
   }
 });
 
-rai.get('http://www.site-with-issues.com').then...
+rri.get('http://www.site-with-issues.com').then...
 ```
 
 ## API
-request-again should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
+request-repeat should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
 ### retry
-request-again should support all [retry-as-promised](https://www.npmjs.com/package/retry-as-promised) functionality, so you can pass all options as you would pass them to the original package by setting them in retry object
+request-repeat should support all [retry-as-promised](https://www.npmjs.com/package/retry-as-promised) functionality, so you can pass all options as you would pass them to the original package by setting them in retry object
 ```js
 retry: {
   /* retry-as-promised options */

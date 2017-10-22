@@ -15,7 +15,7 @@ let isObject = require('lodash').isObject;
  * @param {Object} options
  * @returns {Promise}
  */
-module.exports = function requestAgain(request, method, url, options) {
+module.exports = function request(request, method, url, options) {
     let [_url, _options, retryOptions] = buildOptions(url, options, request.retryDefaults);
 
     let errorCount = 0;
