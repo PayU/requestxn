@@ -96,7 +96,13 @@ describe.only('', function () {
             retry: {
                 retry5xx: true,
                 max: 2,
-                backoffBase: 2000
+                backoffBase: 100,
+                retryStrategyFn: function(response) {
+                    return response.body.match(/Temporary error/);
+                },
+                logErrorFn: function(request, error, retries) {
+                    console.error(`Request to ${request.url} failed on the ${retries} attempt with ${error}`);
+                }
             }
         });
         return reqtry.post({
@@ -108,20 +114,19 @@ describe.only('', function () {
                 stam: 5
             }
         })
-            .then((response) => {
-                console.info(response.statusCode);
-                console.info(response.body);
+            .catch((response) => {
                 console.info(response.retries);
-            })
-            .catch(() => Promise.delay(8000))
-            .then(() => reqtry.post({
-                url: 'http://www.google.com',
-                resolveWithFullResponse: true,
-                agent: agent,
-                retry: {
-                    max: 1,
-                    stam: 5
-                }
-            }));
+                throw response;
+            });
+        // .catch(() => Promise.delay(8000))
+        // .then(() => reqtry.post({
+        //     url: 'http://www.google.com',
+        //     resolveWithFullResponse: true,
+        //     agent: agent,
+        //     retry: {
+        //         max: 1,
+        //         stam: 5
+        //     }
+        // }));
     });
 });
