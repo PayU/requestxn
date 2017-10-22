@@ -97,7 +97,7 @@ retry: {
 a function that is called on success
 ```js
 retry: {
-  successFn: function (response) {
+  successFn: function (request, response, errorCount) {
     // do something on success
   }
 }
@@ -107,7 +107,7 @@ retry: {
 a function that is called on error
 ```js
 retry: {
-  errorFn: function (response) {
+  errorFn: function (request, error, errorCount) {
     // do something on error
   }
 }
