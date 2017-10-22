@@ -67,14 +67,14 @@ rai.get('http://www.site-with-issues.com').then...
 request-again should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
 ### retry
-Supports all [retry-as-promised](https://www.npmjs.com/package/retry-as-promised) options
-In addition to the original package options, the following extra options are accepted
+request-again should support all [retry-as-promised](https://www.npmjs.com/package/retry-as-promised) functionality, so you can pass all options as you would pass them to the original package by setting them in retry object
 ```js
 retry: {
   /* retry-as-promised options */
 }
 ```
 
+In addition to the original package options, the following extra options are accepted
 #### retryOn5xx
 enable retry on any 5xx error
 ```js
