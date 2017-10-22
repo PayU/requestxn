@@ -23,7 +23,7 @@ module.exports = function requestAgain(request, method, uri, options) {
     return retry(() => {
         return request[method](_uri, _options)
             .then((response) => handleResponse(retryOptions, response))
-            .catch((error) => handleError(retryOptions, error, errors));
+            .catch((error) => handleError(retryOptions, request, error, errors));
     }, retryOptions)
         .then((response) => buildResponse(response, errors))
         .catch((error) => { throw buildErrorResponse(error, errors) });
@@ -90,10 +90,10 @@ function handleResponse(retryOptions, response) {
  * @param {Error} error
  * @param {array} errors
  */
-function handleError(retryOptions, error, errors) {
+function handleError(retryOptions, request, error, errors) {
     errors.push(error);
     if (retryOptions.logFn) {
-        retryOptions.logFn(error, errors.length);
+        retryOptions.logFn(error, request, error, errors.length);
     }
     throw error;
 }
