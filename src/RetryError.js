@@ -1,6 +1,6 @@
 'use strict';
 
-module.exports = class CustomError extends Error {
+module.exports = class RetryError extends Error {
     constructor (response, status) {
         // Calling parent constructor of base Error class.
         let statusCode = response.statusCode;

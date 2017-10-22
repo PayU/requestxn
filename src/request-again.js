@@ -1,128 +1,79 @@
 'use strict';
 
 let retry = require('retry-as-promised');
-let map = require('lodash').map;
 let StatusCodeError = require('./StatusCodeError');
-let CustomError = require('./CustomError');
+let RetryError = require('./RetryError');
 let defaults = require('lodash').defaults;
 let isObject = require('lodash').isObject;
 
 /**
- * Send request-again request
+ * Send request using retry-as-promised
  *
- * @param {object} request the request-promise instance to use
+ * @param {Object} request the request-promise instance to use
  * @param {string} method the method to send
- * @param {any} uri the url to send the request to or options
- * @param {object} options
- * @returns
+ * @param {(string|Object)} url the url to send the request to or options
+ * @param {Object} options
+ * @returns {Promise}
  */
-module.exports = function requestAgain(request, method, uri, options) {
-    let [_uri, _options, retryOptions] = buildOptions(uri, options, request.retryDefaults);
+module.exports = function requestAgain(request, method, url, options) {
+    let [_url, _options, retryOptions] = buildOptions(url, options, request.retryDefaults);
 
-    let errors = [];
+    let errorCount = 0;
     return retry(() => {
-        return request[method](_uri, _options)
-            .then((response) => handleResponse(retryOptions, response))
-            .catch((error) => handleError(retryOptions, request, error, errors));
+        return request[method](_url, _options)
+            .then((response) => handleResponse(retryOptions, request, response))
+            .catch((error) => handleError(retryOptions, _url, error, ++errorCount));
     }, retryOptions)
-        .then((response) => buildResponse(response, errors))
-        .catch((error) => { throw buildErrorResponse(error, errors) });
+        .then((response) => buildResponse(response, errorCount));
 };
 
-/**
- *
- *
- * @param {string} url
- * @param {object} options
- * @param {object} retryDefaults
- * @returns
- */
 function buildOptions(url, options, retryDefaults) {
     let retryOptions;
     if (typeof url === 'string') {
         options = options || {};
         retryOptions = defaults(options.retry, retryDefaults);
-        buildRequestOptions(options, retryOptions);
+        options = buildRequestOptions(options, retryOptions);
     } else if (typeof url === 'object') {
         retryOptions = defaults(url.retry, retryDefaults);
-        buildRequestOptions(url, retryOptions);
+        url = buildRequestOptions(url, retryOptions);
     }
 
     return [url, options, retryOptions];
 }
 
-/**
- *
- *
- * @param {object} requestOptions
- * @param {object} retryOptions
- */
 function buildRequestOptions(requestOptions, retryOptions) {
     if (retryOptions.retryOn5xx === true || typeof retryOptions.retryStrategyFn === 'function') {
         requestOptions.simple = false;
         requestOptions.resolveWithFullResponse = true;
     }
+    return requestOptions;
 }
 
-/**
- *
- *
- * @param {object} retryOptions
- * @param {object} response
- * @returns
- */
-function handleResponse(retryOptions, response) {
-    let {retryOn5xx, retryStrategyFn} = retryOptions;
+function handleResponse(retryOptions, request, response, errorCount) {
+    let {retryOn5xx, retryStrategyFn, successFn} = retryOptions;
 
     if (retryOn5xx && response.statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (typeof retryStrategyFn === 'function' && retryStrategyFn(response)) {
-        throw new CustomError(response);
-    } else {
-        return response;
+        throw new RetryError(response);
+    } else if (typeof successFn === 'function') {
+        successFn(request, response, errorCount);
     }
+    return response;
 }
 
-/**
- *
- *
- * @param {object} retryOptions
- * @param {Error} error
- * @param {array} errors
- */
-function handleError(retryOptions, request, error, errors) {
-    errors.push(error);
-    if (retryOptions.logFn) {
-        retryOptions.logFn(error, request, error, errors.length);
+function handleError(retryOptions, request, error, errorCount) {
+    if (retryOptions.errorFn) {
+        retryOptions.errorFn(request, error, errorCount);
     }
     throw error;
 }
 
-/**
- *
- *
- * @param {object} response
- * @param {array} errors
- * @returns
- */
-function buildResponse(response, errors) {
+function buildResponse(response, errorCount) {
     if (isObject(response)) {
-        response.errors = map(errors, (error) => error.message);
-        response.retries = response.errors.length;
-        return response.body;
+        response.errorCount = response.errorCount;
+        return response;
     } else {
         return response;
     }
-}
-
-/**
- *
- *
- * @param {Error} error
- * @param {array} errors
- * @returns
- */
-function buildErrorResponse(error, errors) {
-    error.retries = errors.length;
-    return error;
 }
