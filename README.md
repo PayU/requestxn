@@ -24,7 +24,7 @@ var options = {
       console.error(`- Request to ${request.url} failed on the ${retries} attempt with error ${error.message}`);
     },
     successFn: function(request, response) {
-      console.error(`- Got status-code ${response.statusCode} on request to ${request.url}`);
+      console.info(`- Got status-code ${response.statusCode} on request to ${request.url}`);
     }
   }
 }
@@ -55,7 +55,7 @@ var rai = ra.defaults({
       console.error(`- Request to ${request.url} failed on the ${retries} attempt with error ${error.message}`);
     },
     successFn: function(request, response) {
-      console.error(`- Got status-code ${response.statusCode} on request to ${request.url}`);
+      console.info(`- Got status-code ${response.statusCode} on request to ${request.url}`);
     }
   }
 });
