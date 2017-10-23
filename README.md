@@ -4,9 +4,6 @@
 [![NPM Downloads][downloads-image]][downloads-url]
 # request-repeat
 
-<!-- [![NPM Version][npm-image]][npm-url]
-[![NPM Downloads][downloads-image]][downloads-url]
-[![Test Coverage][coveralls-image]][coveralls-url] -->
 Wraps both request-promise-native and retry-as-promised together, in order to provide an easy way to do requests with retries while returning a promise.
 
 ## API
@@ -115,3 +112,11 @@ var requestWithDefaults = request.defaults({
 
 requestWithDefaults.get('http://www.site-with-issues.com').then...
 ```
+[npm-image]: https://img.shields.io/npm/v/request-repeat.svg?style=flat
+[npm-url]: https://npmjs.org/package/request-repeat
+[travis-image]: https://travis-ci.org/kobik/request-repeat.svg?branch=master
+[travis-url]: https://travis-ci.org/kobik/request-repeat
+[coveralls-image]: https://coveralls.io/repos/github/kobik/request-repeat/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/repos/github/kobik/request-repeat/badge.svg?branch=master
+[downloads-image]: http://img.shields.io/npm/dm/request-repeat.svg?style=flat
+[downloads-url]: https://npmjs.org/package/request-repeat
