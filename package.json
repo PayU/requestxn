@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "mocha test/test.js",
-    "test-travis": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive --reporter spec --check-leaks test/",
-    "test-coverage": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- --recursive --reporter spec --check-leaks test/"
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive --reporter spec --check-leaks test/",
+    "test-coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --recursive --reporter spec --check-leaks test/"
   },
   "keywords": [
     "request",
@@ -15,7 +15,7 @@
     "retry"
   ],
   "author": "Kobi Carmeli",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "lodash": "^4.17.4",
     "request": "^2.83.0",
@@ -34,5 +34,16 @@
     "mocha": "^4.0.1",
     "should": "^13.1.2",
     "sinon": "^4.0.1"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kobik/request-repeat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/kobik/request-repeat/issues"
+  },
+  "homepage": "https://github.com/kobik/request-repeat#readme"
 }
