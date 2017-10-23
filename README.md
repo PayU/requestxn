@@ -1,3 +1,7 @@
+[![NPM Version][npm-image]][npm-url]
+[![Build Status][travis-image]][travis-url]
+[![Test Coverage][coveralls-image]][coveralls-url]
+[![NPM Downloads][downloads-image]][downloads-url]
 # request-repeat
 
 <!-- [![NPM Version][npm-image]][npm-url]
