@@ -71,7 +71,7 @@ function handleError(retryOptions, request, error, errorCount) {
 
 function buildResponse(response, errorCount) {
     if (isObject(response)) {
-        response.errorCount = response.errorCount;
+        response.errorCount = errorCount;
         return response;
     } else {
         return response;

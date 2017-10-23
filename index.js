@@ -1,7 +1,7 @@
 'use strict';
 
 let rp = require('request-promise-native');
-var rr = require('./src/request-repeat');
+var request = require('./src/request-repeat');
 
 module.exports = getImplementations(rp);
 module.exports.defaults = function (options) {
@@ -13,28 +13,28 @@ module.exports.defaults = function (options) {
 function getImplementations(rp) {
     return {
         get: function get() {
-            return rr(rp, 'get', ...arguments);
+            return request(rp, 'get', ...arguments);
         },
         post: function post() {
-            return rr(rp, 'post', ...arguments);
+            return request(rp, 'post', ...arguments);
         },
         delete: function delete_() {
-            return rr(rp, 'delete', ...arguments);
+            return request(rp, 'delete', ...arguments);
         },
         put: function put() {
-            return rr(rp, 'put', ...arguments);
+            return request(rp, 'put', ...arguments);
         },
         patch: function patch() {
-            return rr(rp, 'patch', ...arguments);
+            return request(rp, 'patch', ...arguments);
         },
         head: function head() {
-            return rr(rp, 'head', ...arguments);
+            return request(rp, 'head', ...arguments);
         },
         options: function options() {
-            return rr(rp, 'options', ...arguments);
+            return request(rp, 'options', ...arguments);
         },
         del: function del() {
-            return rr(rp, 'del', ...arguments);
+            return request(rp, 'del', ...arguments);
         },
         forever: function forever() {
             return rp.forever(...arguments);

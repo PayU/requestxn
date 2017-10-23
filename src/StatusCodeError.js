@@ -1,7 +1,7 @@
 'use strict';
 
 module.exports = class StatusCodeError extends Error {
-    constructor (response, status) {
+    constructor (response) {
         // Calling parent constructor of base Error class.
         let statusCode = response.statusCode;
         let body = response.body && typeof response.body.toString === 'function' ? response.body.toString().replace(/\n/g, '\\n') : response.body;

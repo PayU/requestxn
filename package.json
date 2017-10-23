@@ -4,7 +4,9 @@
   "description": "request-promise-native wrapper with retries",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha test/test.js",
+    "test-travis": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive --reporter spec --check-leaks test/",
+    "test-coverage": "./node_modules/.bin/istanbul cover node_modules/mocha/bin/_mocha -- --recursive --reporter spec --check-leaks test/"
   },
   "keywords": [
     "request",
@@ -28,6 +30,7 @@
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "should": "^13.1.2",
     "sinon": "^4.0.1"
