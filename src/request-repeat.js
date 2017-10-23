@@ -1,10 +1,10 @@
 'use strict';
 
-let retry = require('retry-as-promised');
-let StatusCodeError = require('./StatusCodeError');
-let RetryError = require('./RetryError');
-let defaults = require('lodash').defaults;
-let isObject = require('lodash').isObject;
+var retry = require('retry-as-promised');
+var StatusCodeError = require('./StatusCodeError');
+var RetryError = require('./RetryError');
+var defaults = require('lodash').defaults;
+var isObject = require('lodash').isObject;
 
 /**
  * Send request using retry-as-promised
@@ -16,9 +16,9 @@ let isObject = require('lodash').isObject;
  * @returns {Promise}
  */
 module.exports = function request(request, method, url, options) {
-    let [_url, _options, retryOptions] = buildOptions(url, options, request.retryDefaults);
+    var [_url, _options, retryOptions] = buildOptions(url, options, request.retryDefaults);
 
-    let errorCount = 0;
+    var errorCount = 0;
     return retry(() => {
         return request[method](_url, _options)
             .then((response) => handleResponse(retryOptions, request, response))
@@ -28,7 +28,7 @@ module.exports = function request(request, method, url, options) {
 };
 
 function buildOptions(url, options, retryDefaults) {
-    let retryOptions;
+    var retryOptions;
     if (typeof url === 'string') {
         options = options || {};
         retryOptions = defaults(options.retry, retryDefaults);
@@ -50,7 +50,7 @@ function buildRequestOptions(requestOptions, retryOptions) {
 }
 
 function handleResponse(retryOptions, request, response, errorCount) {
-    let {retryOn5xx, retryStrategyFn, successFn} = retryOptions;
+    var {retryOn5xx, retryStrategyFn, successFn} = retryOptions;
 
     if (retryOn5xx && response.statusCode >= 500) {
         throw new StatusCodeError(response);

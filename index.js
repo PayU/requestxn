@@ -1,6 +1,6 @@
 'use strict';
 
-let rp = require('request-promise-native');
+var rp = require('request-promise-native');
 var request = require('./src/request-repeat');
 
 module.exports = getImplementations(rp);

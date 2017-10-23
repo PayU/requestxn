@@ -1,15 +1,15 @@
-let request = require('../index');
-let rp = require('request-promise-native');
-let StatusCodeError = require('../src/StatusCodeError');
-let RetryError = require('../src/RetryError');
-let sinon = require('sinon');
-let should = require('should');
-let Http = require('http');
-let Promise = require('bluebird');
+var request = require('../index');
+var rp = require('request-promise-native');
+var StatusCodeError = require('../src/StatusCodeError');
+var RetryError = require('../src/RetryError');
+var sinon = require('sinon');
+var should = require('should');
+var Http = require('http');
+var Promise = require('bluebird');
 
 describe('When sending get request with defaults', function () {
-    let sandbox;
-    let stub;
+    var sandbox;
+    var stub;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -21,7 +21,7 @@ describe('When sending get request with defaults', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response after 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -32,7 +32,7 @@ describe('When sending get request with defaults', function () {
             });
     });
     it('Should return 500 response after 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -43,7 +43,7 @@ describe('When sending get request with defaults', function () {
             });
     });
     it('Should return an error after 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -55,9 +55,9 @@ describe('When sending get request with defaults', function () {
     });
 });
 describe('When sending get request with max value set', function () {
-    let retry = {max: 3};
-    let sandbox;
-    let stub;
+    var retry = {max: 3};
+    var sandbox;
+    var stub;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -69,7 +69,7 @@ describe('When sending get request with max value set', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -80,7 +80,7 @@ describe('When sending get request with max value set', function () {
             });
     });
     it('Should return 500 response after 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -91,7 +91,7 @@ describe('When sending get request with max value set', function () {
             });
     });
     it('Should return an error after 3 tries', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -104,9 +104,9 @@ describe('When sending get request with max value set', function () {
 });
 
 describe('When sending request with the default max value and retryOn5xx set to true', function () {
-    let retry = {retryOn5xx: true};
-    let sandbox;
-    let stub;
+    var retry = {retryOn5xx: true};
+    var sandbox;
+    var stub;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -118,7 +118,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -129,7 +129,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
             });
     });
     it('Should return 500 response after 1 tries', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -142,9 +142,9 @@ describe('When sending request with the default max value and retryOn5xx set to 
 });
 
 describe('When sending get request with max value set and retryOn5xx set to true', function () {
-    let retry = {max: 3, retryOn5xx: true};
-    let sandbox;
-    let stub;
+    var retry = {max: 3, retryOn5xx: true};
+    var sandbox;
+    var stub;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -156,7 +156,7 @@ describe('When sending get request with max value set and retryOn5xx set to true
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -167,7 +167,7 @@ describe('When sending get request with max value set and retryOn5xx set to true
             });
     });
     it('Should return 500 response after 3 tries', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -178,7 +178,7 @@ describe('When sending get request with max value set and retryOn5xx set to true
             });
     });
     it('Should return oan error on rejection (network error) after 3 tries', function () {
-        let error = new Error('getaddrinfo ENOTFOUND');
+        var error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
         return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(error)
             .then((response) => {
@@ -188,12 +188,12 @@ describe('When sending get request with max value set and retryOn5xx set to true
 });
 
 describe('When sending get request with max value set and retryStrategyFn given', function () {
-    let sandbox;
-    let stub;
-    let fn = function (response) {
+    var sandbox;
+    var stub;
+    var fn = function (response) {
         return response.statusCode === 500;
     };
-    let retry = {max: 3, retryStrategyFn: fn};
+    var retry = {max: 3, retryStrategyFn: fn};
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -205,7 +205,7 @@ describe('When sending get request with max value set and retryStrategyFn given'
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -216,7 +216,7 @@ describe('When sending get request with max value set and retryStrategyFn given'
             });
     });
     it('Should return 500 response after 3 tries', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -229,11 +229,11 @@ describe('When sending get request with max value set and retryStrategyFn given'
 });
 
 describe('When sending request with successFn and errorFn', function () {
-    let sandbox;
-    let stub;
-    let successFn;
-    let errorFn;
-    let retry;
+    var sandbox;
+    var stub;
+    var successFn;
+    var errorFn;
+    var retry;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -248,7 +248,7 @@ describe('When sending request with successFn and errorFn', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        let response = {
+        var response = {
             statusCode: 200,
             body: 'body'
         };
@@ -261,7 +261,7 @@ describe('When sending request with successFn and errorFn', function () {
             });
     });
     it('Should reject 500 response after 3 tries', function () {
-        let response = {
+        var response = {
             statusCode: 500,
             body: 'body'
         };
@@ -274,11 +274,11 @@ describe('When sending request with successFn and errorFn', function () {
             });
     });
     it('Should return 200 response after 3 tries', function () {
-        let successRes = {
+        var successRes = {
             statusCode: 200,
             body: 'success'
         };
-        let failRes = {
+        var failRes = {
             statusCode: 500,
             body: 'fail'
         };
