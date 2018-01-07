@@ -4,6 +4,8 @@ const StatusCodeError = require('./errors/StatusCodeError');
 const RequestError = require('./errors/RequestError');
 const defaults = require('lodash.defaults');
 
+const FUNCTIONS = ['retryStrategyFn', 'onSuccess', 'onError'];
+
 const requester = decorateMethod('get');
 requester.get = decorateMethod('get');
 requester.head = decorateMethod('head');
@@ -39,7 +41,7 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
     return (uri, options) => {
         const $options = buildOptions(uri, options, defaultsOptions);
 
-        ['retryStrategyFn', 'onSuccess', 'onError'].forEach((fn) => {
+        FUNCTIONS.forEach((fn) => {
             if ($options[fn] && typeof $options[fn] !== 'function') {
                 throw new Error(`${fn} must be a function`);
             }
