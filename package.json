@@ -1,7 +1,7 @@
 {
-  "name": "request-repeat",
-  "version": "0.0.3",
-  "description": "request-promise-native wrapper with retries",
+  "name": "requestxn",
+  "version": "1.0.0",
+  "description": "request-promise wrapper with retries",
   "main": "index.js",
   "scripts": {
     "test": "mocha test/test.js",
@@ -17,13 +17,12 @@
   "author": "Kobi Carmeli",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.17.4",
+    "lodash.defaults": "^4.2.0",
     "request": "^2.83.0",
     "request-promise-native": "^1.0.5",
-    "retry-as-promised": "^2.3.1"
+    "retry-as-promised": "^2.3.2"
   },
   "devDependencies": {
-    "bluebird": "^3.5.1",
     "eslint": "^4.7.2",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
@@ -40,10 +39,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kobik/request-repeat.git"
+    "url": "git+https://github.com/kobik/requestxn.git"
   },
   "bugs": {
-    "url": "https://github.com/kobik/request-repeat/issues"
+    "url": "https://github.com/kobik/requestxn/issues"
   },
-  "homepage": "https://github.com/kobik/request-repeat#readme"
+  "homepage": "https://github.com/kobik/requestnx#readme"
 }

@@ -1,18 +1,16 @@
-var request = require('../index');
-var rp = require('request-promise-native');
-var StatusCodeError = require('../src/StatusCodeError');
-var RetryError = require('../src/RetryError');
-var sinon = require('sinon');
-var should = require('should');
-var Http = require('http');
-var Promise = require('bluebird');
+const rp = require('request-promise-native');
+const StatusCodeError = require('../errors/StatusCodeError');
+const RetryError = require('../errors/RetryError');
+const sinon = require('sinon');
+const should = require('should');
 
 describe('When sending get request with defaults', function () {
-    var sandbox;
-    var stub;
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
     before(function () {
-        sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -58,9 +56,11 @@ describe('When sending get request with max value set', function () {
     var retry = {max: 3};
     var sandbox;
     var stub;
+    var request;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -74,7 +74,7 @@ describe('When sending get request with max value set', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.fulfilledWith(response)
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -85,7 +85,7 @@ describe('When sending get request with max value set', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.resolvedWith(response)
+        return request.get('www.google.com', retry).should.be.resolvedWith(response)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -96,7 +96,7 @@ describe('When sending get request with max value set', function () {
             body: 'body'
         };
         stub.rejects(response);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(response)
+        return request.get('www.google.com', retry).should.be.rejectedWith(response)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -104,12 +104,14 @@ describe('When sending get request with max value set', function () {
 });
 
 describe('When sending request with the default max value and retryOn5xx set to true', function () {
-    var retry = {retryOn5xx: true};
-    var sandbox;
-    var stub;
+    const retry = {retryOn5xx: true};
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
+
     before(function () {
-        sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -123,7 +125,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.fulfilledWith(response)
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -134,20 +136,21 @@ describe('When sending request with the default max value and retryOn5xx set to 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
     });
 });
 
-describe('When sending get request with max value set and retryOn5xx set to true', function () {
-    var retry = {max: 3, retryOn5xx: true};
-    var sandbox;
-    var stub;
+describe('When sending get request with max value set to 3 and retryOn5xx set to true', function () {
+    const retry = {max: 3, retryOn5xx: true};
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
     before(function () {
-        sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -161,7 +164,7 @@ describe('When sending get request with max value set and retryOn5xx set to true
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.fulfilledWith(response)
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -172,7 +175,7 @@ describe('When sending get request with max value set and retryOn5xx set to true
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -180,23 +183,25 @@ describe('When sending get request with max value set and retryOn5xx set to true
     it('Should return oan error on rejection (network error) after 3 tries', function () {
         var error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(error)
+        return request.get('www.google.com', retry).should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
     });
 });
 
-describe('When sending get request with max value set and retryStrategyFn given', function () {
-    var sandbox;
-    var stub;
-    var fn = function (response) {
-        return response.statusCode === 500;
+describe('When sending get request with max value set and retryStrategy given', function () {
+    const fn = function (response) {
+        return response.statusCode === 401;
     };
-    var retry = {max: 3, retryStrategyFn: fn};
+    const sandbox = sinon.sandbox.create();
+    const retry = {max: 3, retryStrategy: fn};
+    let request;
+    let stub;
+
     before(function () {
-        sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -210,36 +215,35 @@ describe('When sending get request with max value set and retryStrategyFn given'
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.fulfilledWith(response)
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
-    it('Should return 500 response after 3 tries', function () {
+    it('Should return 401 response after 3 tries', function () {
         var response = {
-            statusCode: 500,
+            statusCode: 401,
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(new RetryError(response))
+        return request.get('www.google.com', retry).should.be.rejectedWith(new RetryError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
     });
 });
 
-describe('When sending request with successFn and errorFn', function () {
-    var sandbox;
-    var stub;
-    var successFn;
-    var errorFn;
-    var retry;
+describe('When sending request with onSuccess and onError', function () {
+    const sandbox = sinon.sandbox.create();
+    const onSuccess = sandbox.stub();
+    const onError = sandbox.stub();
+    const retry = {max: 3, retryOn5xx: true, onSuccess, onError};
+    let request;
+    let stub;
+
     before(function () {
-        sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
-        successFn = sandbox.stub();
-        errorFn = sandbox.stub();
-        retry = {max: 3, successFn: successFn, errorFn: errorFn, retryOn5xx: true};
+        request = require('../index');
     });
     after(function () {
         stub.restore();
@@ -253,11 +257,11 @@ describe('When sending request with successFn and errorFn', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.fulfilledWith(response)
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
-                should(successFn.callCount).eql(1);
-                should(errorFn.callCount).eql(0);
+                should(onSuccess.callCount).eql(1);
+                should(onError.callCount).eql(0);
             });
     });
     it('Should reject 500 response after 3 tries', function () {
@@ -266,11 +270,11 @@ describe('When sending request with successFn and errorFn', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', {retry: retry}).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
-                should(successFn.callCount).eql(0);
-                should(errorFn.callCount).eql(3);
+                should(onSuccess.callCount).eql(0);
+                should(onError.callCount).eql(3);
             });
     });
     it('Should return 200 response after 3 tries', function () {
@@ -284,14 +288,14 @@ describe('When sending request with successFn and errorFn', function () {
         };
         stub.resolves(failRes);
         stub.onCall(2).resolves(successRes);
-        return request.get('www.google.com', {retry: retry})
+        return request.get('www.google.com', retry)
             .then((response) => {
                 should(response.statusCode).eql(200);
                 should(response.body).eql('success');
                 should(response.errorCount).eql(2);
                 should(stub.callCount).eql(3);
-                should(successFn.callCount).eql(1);
-                should(errorFn.callCount).eql(2);
+                should(onSuccess.callCount).eql(1);
+                should(onError.callCount).eql(2);
             });
     });
 });
