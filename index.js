@@ -52,7 +52,7 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
                 .then((response) => handleResponse($options, response, errorCount))
                 .catch((error) => handleError($options, error, ++errorCount));
         }, $options)
-            .then((response) => buildResponse(response, errorCount));
+            .then((response) => buildResponse($options, response, errorCount));
     };
 }
 
@@ -75,14 +75,12 @@ function buildRequestOptions(options) {
 }
 
 function handleResponse(options, response, errorCount) {
-    const {retryOn5xx, retryStrategy, onSuccess, simple, $simple} = options;
+    const {retryOn5xx, retryStrategy, onSuccess} = options;
 
     if (retryOn5xx === true && response.statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (retryStrategy && retryStrategy(response)) {
         throw new RetryError(response);
-    } else if (($simple === true || simple === true) && response.statusCode >= 300) {
-        throw new StatusCodeError(response);
     } else if (onSuccess) {
         onSuccess(options, response, errorCount);
     }
@@ -99,11 +97,13 @@ function handleError(options, error, errorCount) {
     throw error;
 }
 
-function buildResponse(response, errorCount) {
-    if (typeof response === 'object') {
-        response.errorCount = errorCount;
-        return response;
+function buildResponse(options, response, errorCount) {
+    const {$simple, simple} = options;
+
+    if (($simple === true || $simple === undefined || simple === true) && response.statusCode >= 300) {
+        throw new StatusCodeError(response);
     } else {
+        response.errorCount = errorCount;
         return response;
     }
 }

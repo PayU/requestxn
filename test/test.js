@@ -4,7 +4,7 @@ const RetryError = require('../errors/RetryError');
 const sinon = require('sinon');
 const should = require('should');
 
-describe('When sending get request with defaults', function () {
+describe('When sending get request with default values', function () {
     const sandbox = sinon.sandbox.create();
     let stub;
     let request;
@@ -35,7 +35,7 @@ describe('When sending get request with defaults', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com').should.be.fulfilledWith(response)
+        return request.get('www.google.com').should.be.rejectedWith(new StatusCodeError(response))
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -52,6 +52,7 @@ describe('When sending get request with defaults', function () {
             });
     });
 });
+
 describe('When sending get request with max value set', function () {
     var retry = {max: 3};
     var sandbox;
@@ -85,7 +86,7 @@ describe('When sending get request with max value set', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', retry).should.be.resolvedWith(response)
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -130,13 +131,64 @@ describe('When sending request with the default max value and retryOn5xx set to 
                 should(stub.callCount).eql(1);
             });
     });
-    it('Should return 500 response after 1 tries', function () {
+    it('Should return 500 response after 1 try', function () {
         var response = {
             statusCode: 500,
             body: 'body'
         };
         stub.resolves(response);
         return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+});
+
+describe('When sending request with the default max value and retryOn5xx set to true', function () {
+    const retry = {retryOn5xx: true, simple: false};
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
+
+    before(function () {
+        stub = sandbox.stub(rp, 'get');
+        request = require('../index');
+    });
+    after(function () {
+        stub.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+    it('Should return 200 OK response 1 try', function () {
+        var response = {
+            statusCode: 200,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
+            .then(() => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return 500 response after 1 try', function () {
+        var response = {
+            statusCode: 500,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return 401 response after 1 try', function () {
+        var response = {
+            statusCode: 401,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -178,6 +230,17 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
         return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
+            });
+    });
+    it('Should return 401 response after 1 try', function () {
+        var response = {
+            statusCode: 401,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(1);
             });
     });
     it('Should return oan error on rejection (network error) after 3 tries', function () {
