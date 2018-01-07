@@ -7,7 +7,7 @@
 Wraps both request-promise-native with a retry handler, in order to provide an easy way to do requests with retries and returning a promise.
 
 ## API
-request-repeat should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
+requestxn should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
 In addition to the original package options, the following extra options are accepted
 #### max
@@ -59,7 +59,7 @@ onError: function (request, error, errorCount) {
 ```
 #### Usage
 ```js
-const request = require('request-repeat');
+const request = require('requestxn');
 
 const options = {
   url: 'http://www.site-with-issues.com',
@@ -91,7 +91,7 @@ const options = {
 
 #### Usage with defaults
 ```js
-const request = require('request-repeat');
+const request = require('requestxn');
 
 const requestWithDefaults = request.defaults({
   json: true,
@@ -111,11 +111,11 @@ const requestWithDefaults = request.defaults({
 
 requestWithDefaults.get('http://www.site-with-issues.com').then...
 ```
-[npm-image]: https://img.shields.io/npm/v/request-repeat.svg?style=flat
-[npm-url]: https://npmjs.org/package/request-repeat
-[travis-image]: https://travis-ci.org/kobik/request-repeat.svg?branch=master
-[travis-url]: https://travis-ci.org/kobik/request-repeat
-[coveralls-image]: https://coveralls.io/repos/github/kobik/request-repeat/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/repos/github/kobik/request-repeat/badge.svg?branch=master
-[downloads-image]: http://img.shields.io/npm/dm/request-repeat.svg?style=flat
-[downloads-url]: https://npmjs.org/package/request-repeat
+[npm-image]: https://img.shields.io/npm/v/requestxn.svg?style=flat
+[npm-url]: https://npmjs.org/package/requestxn
+[travis-image]: https://travis-ci.org/kobik/requestxn.svg?branch=master
+[travis-url]: https://travis-ci.org/kobik/requestxn
+[coveralls-image]: https://coveralls.io/repos/github/kobik/requestxn/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/repos/github/kobik/requestxn/badge.svg?branch=master
+[downloads-image]: http://img.shields.io/npm/dm/requestxn.svg?style=flat
+[downloads-url]: https://npmjs.org/package/requestxn
