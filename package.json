@@ -3,10 +3,17 @@
   "version": "1.0.3",
   "description": "request-promise wrapper with retries",
   "main": "index.js",
+  "nyc": {
+    "reporter": [
+      "lcov",
+      "text"
+    ],
+    "cache": true,
+    "all": true
+  },
   "scripts": {
     "test": "mocha test/test.js",
-    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --recursive --reporter spec --check-leaks test/",
-    "test-coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --recursive --reporter spec --check-leaks test/"
+    "test-travis": "nyc npm test"
   },
   "keywords": [
     "request",
@@ -29,8 +36,8 @@
     "eslint-plugin-node": "^5.1.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
+    "nyc": "^11.4.1",
     "should": "^13.1.2",
     "sinon": "^4.0.1"
   },
