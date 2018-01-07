@@ -6,40 +6,40 @@
 [![NPM](https://nodei.co/npm/requestxn.png?downloads=true&downloadRank=true&stars=true)][npm-stats]
 # requestXn
 
-Wraps both request-promise-native with a retry handler, in order to provide an easy way to do requests with retries and returning a promise.
-
-*Note* request-promise option `resolveWithFullResponse` will be always set to true
+Wraps both request-promise-native with a retry handler, in order to provide an easy way to send requests with retries with a promises.
 
 ## API
 requestxn should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
-In addition to the original package options, the following extra options are accepted
+**Note**: *request-promise* option `resolveWithFullResponse` will be always set to `true`. Hence, the result of any successful request would always contain the full response, regardless its user-defined value.
+
+In addition to the original *request-promise* options, the following extra options are accepted
 #### max
 Maximum number of attempts. Default: 1
 ```js
-max: 4
+max: 1
 ```
 
 #### backoffBase (Default: 100)
 Initial backoff duration in ms. Default: 100
 ```js
-backoffBase: 1000
+backoffBase: 100
 ```
 
-#### backoffBaseExponent (Default: 1.1)
-Exponent to increase backoff each try. Default: 1.1
+#### backoffExponent (Default: 1.1)
+Exponent to increase backoff on each attempt. Default: 1.1
 ```js
-backoffBaseExponent: 1.2
+backoffExponent: 1.1
 ```
 
 #### retryOn5xx
-Enable retry on any 5xx error. Default: false
+Enable retry on 5xx error. Default: false
 ```js
 retryOn5xx: true
 ```
 
 #### retryStrategy
-a function that is used to decide on what other cases to do a retry
+Custom retry logic function
 ```js
 retryStrategy: function (response) {
   // return a boolean
@@ -47,7 +47,7 @@ retryStrategy: function (response) {
 ```
 
 #### onSuccess
-a function that is called on success
+Function to be executed on success
 ```js
 onSuccess: function (request, response, errorCount) {
     // do something on success
@@ -55,7 +55,7 @@ onSuccess: function (request, response, errorCount) {
 ```
 
 #### onError
-a function that is called on error
+Function to be executed on error
 ```js
 onError: function (request, error, errorCount) {
   // do something on error
@@ -71,7 +71,7 @@ const options = {
   json: true,
   max: 3,
   backoffBase: 500,
-  backoffExponent: 500,
+  backoffExponent: 1.3,
   retryOn5xx: true,
   retryStrategyFn: function(response) {
     return response.statusCode === 500 && response.body.match(/Temporary error/);
@@ -102,7 +102,7 @@ const requestWithDefaults = request.defaults({
   max: 3,
   backoffBase: 500,
   retryOn5xx: true,
-  retryStrategyFn: function(response) {
+  retryStrategy: function(response) {
     return response.statusCode === 500 && response.body.match(/Temporary error/);
   },
   onError: function(request, error, errorCount) {
