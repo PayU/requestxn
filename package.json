@@ -13,7 +13,8 @@
   },
   "scripts": {
     "test": "mocha test/test.js",
-    "test-travis": "nyc npm test"
+    "test-travis": "nyc npm test",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
   },
   "keywords": [
     "request",
@@ -30,6 +31,7 @@
     "retry-as-promised": "^2.3.2"
   },
   "devDependencies": {
+    "coveralls": "^3.0.0",
     "eslint": "^4.7.2",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.7.0",
