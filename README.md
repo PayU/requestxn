@@ -6,6 +6,8 @@
 
 Wraps both request-promise-native with a retry handler, in order to provide an easy way to do requests with retries and returning a promise.
 
+*Note* request-promise option `resolveWithFullResponse` will be always set to true
+
 ## API
 requestxn should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
