@@ -2,6 +2,8 @@
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![NPM Downloads][downloads-image]][downloads-url]
+
+[![NPM](https://nodei.co/npm/requestxn.png?downloads=true&downloadRank=true&stars=true)][npm-stats]
 # requestXn
 
 Wraps both request-promise-native with a retry handler, in order to provide an easy way to do requests with retries and returning a promise.
@@ -121,3 +123,4 @@ requestWithDefaults.get('http://www.site-with-issues.com').then...
 [coveralls-url]: https://coveralls.io/repos/github/kobik/requestxn/badge.svg?branch=master
 [downloads-image]: http://img.shields.io/npm/dm/requestxn.svg?style=flat
 [downloads-url]: https://npmjs.org/package/requestxn
+[npm-stats]: https://nodei.co/npm/requestxn/
