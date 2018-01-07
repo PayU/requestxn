@@ -1,7 +1,7 @@
 const rp = require('request-promise-native');
 const retry = require('retry-as-promised');
 const StatusCodeError = require('./errors/StatusCodeError');
-const RetryError = require('./errors/RetryError');
+const RequestError = require('./errors/RequestError');
 const defaults = require('lodash.defaults');
 
 const requester = decorateMethod('get');
@@ -49,10 +49,10 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
 
         return retry(() => {
             return rp[method]($options)
-                .then((response) => handleResponse($options, response, errorCount))
-                .catch((error) => handleError($options, error, ++errorCount));
+                .then(response => handleResponse($options, response, errorCount))
+                .catch(error => handleError($options, error, ++errorCount));
         }, $options)
-            .then((response) => buildResponse($options, response, errorCount));
+            .then(response => buildResponse($options, response, errorCount));
     };
 }
 
@@ -67,7 +67,7 @@ function buildOptions(uri, options = {}, defaultOptions) {
 }
 
 function buildRequestOptions(options) {
-    options.$simple = options.simple;
+    options.originalSimpleValue = options.simple;
     options.simple = false;
     options.resolveWithFullResponse = true;
 
@@ -80,7 +80,7 @@ function handleResponse(options, response, errorCount) {
     if (retryOn5xx === true && response.statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (retryStrategy && retryStrategy(response)) {
-        throw new RetryError(response);
+        throw new RequestError(response);
     } else if (onSuccess) {
         onSuccess(options, response, errorCount);
     }
@@ -98,9 +98,9 @@ function handleError(options, error, errorCount) {
 }
 
 function buildResponse(options, response, errorCount) {
-    const {$simple, simple} = options;
+    const {originalSimpleValue} = options;
 
-    if (($simple === true || $simple === undefined || simple === true) && response.statusCode >= 300) {
+    if ((originalSimpleValue === true || originalSimpleValue === undefined) && response.statusCode >= 300) {
         throw new StatusCodeError(response);
     } else {
         response.errorCount = errorCount;

@@ -1,6 +1,6 @@
 const CustomError = require('./CustomError');
 
-module.exports = class RetryError extends CustomError {
+module.exports = class RequestError extends CustomError {
     constructor (response) {
         super(response);
 

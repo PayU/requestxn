@@ -1,6 +1,6 @@
 const rp = require('request-promise-native');
 const StatusCodeError = require('../errors/StatusCodeError');
-const RetryError = require('../errors/RetryError');
+const RequestError = require('../errors/RequestError');
 const sinon = require('sinon');
 const should = require('should');
 
@@ -19,7 +19,7 @@ describe('When sending get request with default values', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -30,7 +30,7 @@ describe('When sending get request with default values', function () {
             });
     });
     it('Should return 500 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -41,7 +41,7 @@ describe('When sending get request with default values', function () {
             });
     });
     it('Should return an error after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -54,10 +54,10 @@ describe('When sending get request with default values', function () {
 });
 
 describe('When sending get request with max value set', function () {
-    var retry = {max: 3};
-    var sandbox;
-    var stub;
-    var request;
+    const retry = {max: 3};
+    let sandbox;
+    let stub;
+    let request;
     before(function () {
         sandbox = sinon.sandbox.create();
         stub = sandbox.stub(rp, 'get');
@@ -70,7 +70,7 @@ describe('When sending get request with max value set', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -81,7 +81,7 @@ describe('When sending get request with max value set', function () {
             });
     });
     it('Should return 500 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -92,7 +92,7 @@ describe('When sending get request with max value set', function () {
             });
     });
     it('Should return an error after 3 tries', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -121,7 +121,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -132,7 +132,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
             });
     });
     it('Should return 500 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -161,7 +161,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -172,7 +172,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
             });
     });
     it('Should return 500 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -183,7 +183,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
             });
     });
     it('Should return 401 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 401,
             body: 'body'
         };
@@ -211,7 +211,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -222,7 +222,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
             });
     });
     it('Should return 500 response after 3 tries', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
@@ -233,7 +233,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
             });
     });
     it('Should return 401 response after 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 401,
             body: 'body'
         };
@@ -244,7 +244,65 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
             });
     });
     it('Should return oan error on rejection (network error) after 3 tries', function () {
-        var error = new Error('getaddrinfo ENOTFOUND');
+        const error = new Error('getaddrinfo ENOTFOUND');
+        stub.rejects(error);
+        return request.get('www.google.com', retry).should.be.rejectedWith(error)
+            .then((response) => {
+                should(stub.callCount).eql(3);
+            });
+    });
+});
+
+describe('When sending get request with retryOn5xx set to true and simple set to false', function () {
+    const retry = {max: 3, retryOn5xx: true, simple: false};
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
+    before(function () {
+        stub = sandbox.stub(rp, 'get');
+        request = require('../index');
+    });
+    after(function () {
+        stub.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+    it('Should return 200 OK response 1 try', function () {
+        const response = {
+            statusCode: 200,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
+            .then(() => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return 500 response after 3 tries', function () {
+        const response = {
+            statusCode: 500,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(3);
+            });
+    });
+    it('Should return 401 response after 1 try', function () {
+        const response = {
+            statusCode: 401,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.fulfilledWith(response)
+            .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return oan error on rejection (network error) after 3 tries', function () {
+        const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
         return request.get('www.google.com', retry).should.be.rejectedWith(error)
             .then((response) => {
@@ -273,7 +331,7 @@ describe('When sending get request with max value set and retryStrategy given', 
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
@@ -284,12 +342,12 @@ describe('When sending get request with max value set and retryStrategy given', 
             });
     });
     it('Should return 401 response after 3 tries', function () {
-        var response = {
+        const response = {
             statusCode: 401,
             body: 'body'
         };
         stub.resolves(response);
-        return request.get('www.google.com', retry).should.be.rejectedWith(new RetryError(response))
+        return request.get('www.google.com', retry).should.be.rejectedWith(new RequestError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -315,37 +373,51 @@ describe('When sending request with onSuccess and onError', function () {
         sandbox.resetHistory();
     });
     it('Should return 200 OK response 1 try', function () {
-        var response = {
+        const response = {
             statusCode: 200,
             body: 'body'
         };
+        const expectedOptions = Object.assign({
+            uri: 'www.google.com',
+            resolveWithFullResponse: true,
+            simple: false
+        }, retry);
+
         stub.resolves(response);
         return request.get('www.google.com', retry).should.be.fulfilledWith(response)
             .then(() => {
                 should(stub.callCount).eql(1);
                 should(onSuccess.callCount).eql(1);
+                sinon.assert.calledWithMatch(onSuccess, expectedOptions, response, 0);
                 should(onError.callCount).eql(0);
             });
     });
     it('Should reject 500 response after 3 tries', function () {
-        var response = {
+        const response = {
             statusCode: 500,
             body: 'body'
         };
+        const expectedOptions = Object.assign({
+            uri: 'www.google.com',
+            resolveWithFullResponse: true,
+            simple: false
+        }, retry);
+
         stub.resolves(response);
         return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
                 should(onSuccess.callCount).eql(0);
                 should(onError.callCount).eql(3);
+                sinon.assert.calledWithMatch(onError, expectedOptions, response, 3);
             });
     });
     it('Should return 200 response after 3 tries', function () {
-        var successRes = {
+        const successRes = {
             statusCode: 200,
             body: 'success'
         };
-        var failRes = {
+        const failRes = {
             statusCode: 500,
             body: 'fail'
         };
