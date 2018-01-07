@@ -12,6 +12,8 @@ module.exports = class CustomError extends Error {
             super(response);
         }
 
+        this.response = response;
+
         // Saving class name in the property of our custom error as a shortcut.
         this.name = this.constructor.name;
     }
