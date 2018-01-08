@@ -77,12 +77,9 @@ describe('When sending get request with default values', function () {
             });
     });
     it('Should return an error after 1 try', function () {
-        const response = {
-            statusCode: 500,
-            body: 'body'
-        };
-        stub.rejects(response);
-        return request.get('www.google.com').should.be.rejectedWith(response)
+        const error = new Error('some error');
+        stub.rejects(error);
+        return request.get('www.google.com').should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -124,6 +121,23 @@ describe('When sending get request with max value set', function () {
         stub.resolves(response);
         return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return 500 response after 1 try', function () {
+        const response = {
+            statusCode: 500,
+            body: {
+                var: 'val'
+            }
+        };
+        const expectedError = new Error(`${response.statusCode} - "${JSON.stringify(response.body)}"`);
+        expectedError.name = 'StatusCodeError';
+        expectedError.response = response;
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejected()
+            .then((error) => {
+                should(error).be.containDeep(expectedError);
                 should(stub.callCount).eql(1);
             });
     });
@@ -276,7 +290,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
                 should(stub.callCount).eql(1);
             });
     });
-    it('Should return oan error on rejection (network error) after 3 tries', function () {
+    it('Should return an error on rejection (network error) after 3 tries', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
         return request.get('www.google.com', retry).should.be.rejectedWith(error)
@@ -334,7 +348,7 @@ describe('When sending get request with retryOn5xx set to true and simple set to
                 should(stub.callCount).eql(1);
             });
     });
-    it('Should return oan error on rejection (network error) after 3 tries', function () {
+    it('Should return an error on rejection (network error) after 3 tries', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
         return request.get('www.google.com', retry).should.be.rejectedWith(error)
@@ -623,6 +637,88 @@ describe('When sending request with onSuccess and onError', function () {
                 should(stub.callCount).eql(3);
                 should(onSuccess.callCount).eql(1);
                 should(onError.callCount).eql(2);
+            });
+    });
+});
+
+describe('When .defaults', function () {
+    const retry = {max: 3, retryOn5xx: true};
+    const sandbox = sinon.sandbox.create();
+    let stub;
+    let request;
+    before(function () {
+        stub = sandbox.stub(rp, 'get');
+        request = require('../index').defaults(retry);
+    });
+    after(function () {
+        stub.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+    it('Should return 200 OK response 1 try', function () {
+        const response = {
+            statusCode: 200,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com').should.be.fulfilledWith(response.body)
+            .then(() => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should return 500 response after 3 tries', function () {
+        const response = {
+            statusCode: 500,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com').should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(3);
+            });
+    });
+    it('Should return 401 response after 1 try', function () {
+        const response = {
+            statusCode: 401,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com').should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should apply new simple value', function () {
+        const overridingOptions = {simple: false};
+        const response = {
+            statusCode: 401,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', overridingOptions).should.be.fulfilledWith(response.body)
+            .then((response) => {
+                should(stub.callCount).eql(1);
+            });
+    });
+    it('Should apply new max value', function () {
+        const overridingOptions = {max: 5, simple: false};
+        const response = {
+            statusCode: 500,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get('www.google.com', overridingOptions).should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(5);
+            });
+    });
+    it('Should return an error on rejection (network error) after 3 tries', function () {
+        const error = new Error('getaddrinfo ENOTFOUND');
+        stub.rejects(error);
+        return request.get('www.google.com').should.be.rejectedWith(error)
+            .then((response) => {
+                should(stub.callCount).eql(3);
             });
     });
 });
