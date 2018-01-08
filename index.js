@@ -1,5 +1,5 @@
 const rp = require('request-promise-native');
-const retry = require('retry-as-promised');
+const retry = require('./retry');
 const StatusCodeError = require('./errors/StatusCodeError');
 const RequestError = require('./errors/RequestError');
 const defaults = require('lodash.defaults');
@@ -40,6 +40,7 @@ module.exports = requester;
 function decorateMethod(method, defaultsOptions = {max: 1}) {
     return (uri, options) => {
         const $options = buildOptions(uri, options, defaultsOptions);
+        const {max, backoffBase, backoffExponent} = $options;
 
         try {
             validateInput($options);
@@ -53,7 +54,7 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
             return rp[method]($options)
                 .then(response => handleResponse($options, response, errorCount))
                 .catch(error => handleError($options, error, ++errorCount));
-        }, $options)
+        }, {max, backoffBase, backoffExponent})
             .then(response => buildResponse($options, response, errorCount));
     };
 }
