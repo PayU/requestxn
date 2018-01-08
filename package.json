@@ -4,6 +4,11 @@
   "description": "request-promise wrapper with retries",
   "main": "index.js",
   "nyc": {
+    "check-coverage": true,
+    "lines": 98,
+    "statements": 98,
+    "functions": 98,
+    "branches": 98,
     "reporter": [
       "lcov",
       "text"
