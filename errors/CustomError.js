@@ -2,7 +2,7 @@ module.exports = class CustomError extends Error {
     constructor (response) {
         // handle case simple: false
         const {statusCode, body} = response;
-        const message = `${statusCode} - "${stringfyBody(body)}"`;
+        const message = `${statusCode} - "${stringifyBody(body)}"`;
         // Calling parent constructor of base Error class.
         super(message);
 
@@ -13,12 +13,14 @@ module.exports = class CustomError extends Error {
     }
 };
 
-function stringfyBody(body) {
-    let strigifiedBody;
+function stringifyBody(body) {
     if (typeof body === 'object') {
-        strigifiedBody = JSON.stringify(body);
+        return JSON.stringify(body).replace(/\n/g, '\\n');
+    } else if (typeof body === 'string') {
+        return body.replace(/\n/g, '\\n');
+    } else if (body) {
+        return body;
     } else {
-        strigifiedBody = body;
+        return '';
     }
-    return strigifiedBody.replace(/\n/g, '\\n');
 }

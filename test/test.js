@@ -127,17 +127,11 @@ describe('When sending get request with max value set', function () {
     it('Should return 500 response after 1 try', function () {
         const response = {
             statusCode: 500,
-            body: {
-                var: 'val'
-            }
+            body: 'response'
         };
-        const expectedError = new Error(`${response.statusCode} - "${JSON.stringify(response.body)}"`);
-        expectedError.name = 'StatusCodeError';
-        expectedError.response = response;
         stub.resolves(response);
-        return request.get('www.google.com', retry).should.be.rejected()
-            .then((error) => {
-                should(error).be.containDeep(expectedError);
+        return request.get('www.google.com', retry).should.be.rejectedWith(new StatusCodeError(response))
+            .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
@@ -637,6 +631,73 @@ describe('When sending request with onSuccess and onError', function () {
                 should(stub.callCount).eql(3);
                 should(onSuccess.callCount).eql(1);
                 should(onError.callCount).eql(2);
+            });
+    });
+});
+
+describe('When throwing an error', function () {
+    const sandbox = sinon.sandbox.create();
+    const onSuccess = sandbox.stub();
+    const onError = sandbox.stub();
+    const retry = {max: 3, retryOn5xx: true, onSuccess, onError};
+    let request;
+    let stub;
+
+    before(function () {
+        stub = sandbox.stub(rp, 'get');
+        request = require('../index');
+    });
+    after(function () {
+        stub.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+
+    it('Should correctly throw error when there the response body is in JSON format', function () {
+        const response = {
+            statusCode: 500,
+            body: {
+                var: 'val'
+            }
+        };
+        const expectedError = new Error(`${response.statusCode} - "${JSON.stringify(response.body)}"`);
+        expectedError.name = 'StatusCodeError';
+        expectedError.response = response;
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejected()
+            .then((error) => {
+                should(error).be.containDeep(expectedError);
+                should(stub.callCount).eql(3);
+            });
+    });
+    it('Should correctly throw error when there is no response body', function () {
+        const response = {
+            statusCode: 500
+        };
+        const expectedError = new Error(`${response.statusCode} - `);
+        expectedError.name = 'StatusCodeError';
+        expectedError.response = response;
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejected()
+            .then((error) => {
+                should(error).be.containDeep(expectedError);
+                should(stub.callCount).eql(3);
+            });
+    });
+    it('Should correctly throw error when the response body is not a string', function () {
+        const response = {
+            statusCode: 500,
+            body: 5
+        };
+        const expectedError = new Error(`${response.statusCode} - 5`);
+        expectedError.name = 'StatusCodeError';
+        expectedError.response = response;
+        stub.resolves(response);
+        return request.get('www.google.com', retry).should.be.rejected()
+            .then((error) => {
+                should(error).be.containDeep(expectedError);
+                should(stub.callCount).eql(3);
             });
     });
 });
