@@ -11,8 +11,6 @@ Wraps both request-promise-native with a retry handler, in order to provide an e
 ## API
 requestxn should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
-**Note**: *request-promise* option `resolveWithFullResponse` will be always set to `true`. Hence, the result of any successful request would always contain the full response, regardless its user-defined value.
-
 In addition to the original *request-promise* options, the following extra options are accepted
 #### max
 Maximum number of attempts. Default: 1

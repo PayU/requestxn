@@ -4,7 +4,7 @@ const StatusCodeError = require('./errors/StatusCodeError');
 const RequestError = require('./errors/RequestError');
 const defaults = require('lodash.defaults');
 
-const FUNCTIONS = ['retryStrategyFn', 'onSuccess', 'onError'];
+const FUNCTIONS = ['retryStrategy', 'onSuccess', 'onError'];
 
 const requester = decorateMethod('get');
 requester.get = decorateMethod('get');
@@ -41,11 +41,11 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
     return (uri, options) => {
         const $options = buildOptions(uri, options, defaultsOptions);
 
-        FUNCTIONS.forEach((fn) => {
-            if ($options[fn] && typeof $options[fn] !== 'function') {
-                throw new Error(`${fn} must be a function`);
-            }
-        });
+        try {
+            validateInput($options);
+        } catch (error) {
+            return Promise.reject(error);
+        }
 
         let errorCount = 0;
 
@@ -68,8 +68,17 @@ function buildOptions(uri, options = {}, defaultOptions) {
     }
 }
 
+function validateInput(options) {
+    FUNCTIONS.forEach((fn) => {
+        if (options[fn] && typeof options[fn] !== 'function') {
+            throw new Error(`${fn} must be a function`);
+        }
+    });
+}
+
 function buildRequestOptions(options) {
     options.originalSimpleValue = options.simple;
+    options.originalResolveWithFullResponse = options.resolveWithFullResponse;
     options.simple = false;
     options.resolveWithFullResponse = true;
 
@@ -100,12 +109,14 @@ function handleError(options, error, errorCount) {
 }
 
 function buildResponse(options, response, errorCount) {
-    const {originalSimpleValue} = options;
+    const {originalSimpleValue, originalResolveWithFullResponse} = options;
 
     if ((originalSimpleValue === true || originalSimpleValue === undefined) && response.statusCode >= 300) {
         throw new StatusCodeError(response);
-    } else {
+    } else if (originalResolveWithFullResponse === true) {
         response.errorCount = errorCount;
         return response;
+    } else {
+        return response.body;
     }
 }
