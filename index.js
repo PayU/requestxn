@@ -48,14 +48,15 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
             return Promise.reject(error);
         }
 
-        let errorCount = 0;
+        let attempts = 0;
 
         return retry(() => {
+            attempts++;
             return rp[method]($options)
-                .then(response => handleResponse($options, response, errorCount))
-                .catch(error => handleError($options, error, ++errorCount));
+                .then(response => handleResponse($options, response, attempts))
+                .catch(error => handleError($options, error, attempts));
         }, {max, backoffBase, backoffExponent})
-            .then(response => buildResponse($options, response, errorCount));
+            .then(response => buildResponse($options, response, attempts));
     };
 }
 
@@ -86,38 +87,51 @@ function buildRequestOptions(options) {
     return options;
 }
 
-function handleResponse(options, response, errorCount) {
-    const {retryOn5xx, retryStrategy, onSuccess} = options;
+function handleResponse(options, response, attempts) {
+    const {retryOn5xx, retryStrategy, originalSimpleValue} = options;
+    const {statusCode} = response;
 
     if (retryOn5xx === true && response.statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (retryStrategy && retryStrategy(response)) {
-        throw new RequestError(response);
-    } else if (onSuccess) {
-        onSuccess(options, response, errorCount);
+        const error = isStatusCodeFailure(originalSimpleValue, statusCode)
+            ? new StatusCodeError(response)
+            : new RequestError(response);
+        throw error;
     }
     return response;
 }
 
-function handleError(options, error, errorCount) {
+function handleError(options, error, attempts) {
     const {onError} = options;
 
     if (onError) {
-        onError(options, error, errorCount);
+        onError(options, error, attempts);
     }
 
     throw error;
 }
 
-function buildResponse(options, response, errorCount) {
-    const {originalSimpleValue, originalResolveWithFullResponse} = options;
+function buildResponse(options, response, attempts) {
+    const {onSuccess, onError, originalSimpleValue, originalResolveWithFullResponse} = options;
+    const {statusCode} = response;
 
-    if ((originalSimpleValue === true || originalSimpleValue === undefined) && response.statusCode >= 300) {
-        throw new StatusCodeError(response);
-    } else if (originalResolveWithFullResponse === true) {
-        response.errorCount = errorCount;
+    if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
+        const error = new StatusCodeError(response);
+        onError && onError(options, error, attempts);
+        throw error;
+    } else {
+        onSuccess && onSuccess(options, response, attempts);
+    }
+
+    if (originalResolveWithFullResponse === true) {
+        response.attempts = attempts;
         return response;
     } else {
         return response.body;
     }
+}
+
+function isStatusCodeFailure(simple, statusCode) {
+    return statusCode >= 300 && (simple === true || simple === undefined);
 }
