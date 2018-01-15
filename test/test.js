@@ -768,7 +768,7 @@ describe('On connection issues', function () {
     });
 
     it('Should retry on connection timeout', function () {
-        return request.get({uri: URI, max: 3, timeout: 3, backoffBase: 100}).should.be.rejectedWith('Error: ETIMEDOUT')
+        return request.get({uri: URI, max: 3, timeout: 10, backoffBase: 100}).should.be.rejectedWith('Error: ETIMEDOUT')
             .then(() => {
                 should(spy.callCount).eql(3);
             });
