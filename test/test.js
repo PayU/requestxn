@@ -768,9 +768,21 @@ describe('On connection issues', function () {
     });
 
     it('Should retry on connection timeout', function () {
-        return request.get({uri: URI, max: 3, timeout: 10, backoffBase: 100}).should.be.rejectedWith('Error: ETIMEDOUT')
+        const server = nock(URI)
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body');
+
+        return request.get({uri: URI, max: 3, timeout: 1, backoffBase: 100}).should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(spy.callCount).eql(3);
+                server.isDone();
             });
     });
 });
