@@ -91,13 +91,14 @@ function handleResponse(options, response, attempts) {
     const {retryOn5xx, retryStrategy, originalSimpleValue} = options;
     const {statusCode} = response;
 
-    if (retryOn5xx === true && response.statusCode >= 500) {
+    if (retryOn5xx === true && statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (retryStrategy && retryStrategy(response)) {
-        const error = isStatusCodeFailure(originalSimpleValue, statusCode)
-            ? new StatusCodeError(response)
-            : new RequestError(response);
-        throw error;
+        if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
+            throw new StatusCodeError(response);
+        } else {
+            throw new RequestError(response);
+        }
     }
     return response;
 }
@@ -120,9 +121,9 @@ function buildResponse(options, response, attempts) {
         const error = new StatusCodeError(response);
         onError && onError(options, error, attempts);
         throw error;
-    } else {
-        onSuccess && onSuccess(options, response, attempts);
     }
+
+    onSuccess && onSuccess(options, response, attempts);
 
     if (originalResolveWithFullResponse === true) {
         response.attempts = attempts;
