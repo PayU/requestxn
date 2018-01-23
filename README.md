@@ -2,6 +2,8 @@
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
 [![NPM Downloads][downloads-image]][downloads-url]
+<!-- [![Maintainability][codeclimate-maintainability-image]][codeclimate-maintainability-url] -->
+<!-- [![Test Coverage][codeclimate-coverage-image]][codeclimate-coverage-url] -->
 
 [![NPM](https://nodei.co/npm/requestxn.png?downloads=true&downloadRank=true&stars=true)][npm-stats]
 # requestXn
@@ -47,7 +49,7 @@ retryStrategy: function (response) {
 #### onSuccess
 Function to be executed on success
 ```js
-onSuccess: function (request, response, errorCount) {
+onSuccess: function (options, response, attempts) {
     // do something on success
 }
 ```
@@ -55,7 +57,7 @@ onSuccess: function (request, response, errorCount) {
 #### onError
 Function to be executed on error
 ```js
-onError: function (request, error, errorCount) {
+onError: function (options, error, attempts) {
   // do something on error
 }
 ```
@@ -71,14 +73,14 @@ const options = {
   backoffBase: 500,
   backoffExponent: 1.3,
   retryOn5xx: true,
-  retryStrategyFn: function(response) {
+  retryStrategy: function(response) {
     return response.statusCode === 500 && response.body.match(/Temporary error/);
   },
-  onError: function(request, error, errorCount) {
-    console.error(`- Request to ${request.url} failed on the ${retries} attempt with error ${error.message}`);
+  onError: function(options, error, attempts) {
+    console.error(`- Request to ${options.uri} failed on the ${attempts} attempt with error ${error.message}`);
   },
-  onSuccess: function(request, response) {
-    console.info(`- Got status-code ${response.statusCode} on request to ${request.url}`);
+  onSuccess: function(options, response, attempts) {
+    console.info(`- Got status-code ${response.statusCode} on request to ${request.uri} after ${attempts}`);
   }
 }
 ```
@@ -122,3 +124,7 @@ requestWithDefaults.get('http://www.site-with-issues.com').then...
 [downloads-image]: http://img.shields.io/npm/dm/requestxn.svg?style=flat
 [downloads-url]: https://npmjs.org/package/requestxn
 [npm-stats]: https://nodei.co/npm/requestxn/
+[codeclimate-maintainability-image]: https://api.codeclimate.com/v1/badges/d7bd5d2253291c57dd69/maintainability
+[codeclimate-maintainability-url]: https://codeclimate.com/github/kobik/requestxn/maintainability
+[codeclimate-coverage-image]: https://api.codeclimate.com/v1/badges/d7bd5d2253291c57dd69/test_coverage
+[codeclimate-coverage-url]: https://codeclimate.com/github/kobik/requestxn/test_coverage
