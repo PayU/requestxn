@@ -1,6 +1,6 @@
 {
   "name": "requestxn",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "request-promise wrapper with retries",
   "main": "index.js",
   "nyc": {
