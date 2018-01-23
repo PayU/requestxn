@@ -89,10 +89,12 @@ function buildRequestOptions(options) {
 }
 
 function handleResponse(options, response, attempts) {
-    const {retryOn5xx, retryStrategy, originalSimpleValue} = options;
+    const {retryOn5xx, retryStrategy, originalSimpleValue, rejectOn5xx, max} = options;
     const {statusCode} = response;
 
-    if (retryOn5xx === true && statusCode >= 500) {
+    if (rejectOn5xx !== true && attempts === max) {
+        return response;
+    } else if (retryOn5xx === true && statusCode >= 500) {
         throw new StatusCodeError(response);
     } else if (retryStrategy && retryStrategy(response)) {
         if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
