@@ -21,6 +21,8 @@ const JSON_RESPONSE_500 = {
     }
 };
 
+// TODO: Add tests for all methods (Upper and lower cases)
+// TODO: Add tests for calling the function directly by passing method in options
 describe('Validation checks', function() {
     const sandbox = sinon.sandbox.create();
     let stub;
@@ -38,19 +40,22 @@ describe('Validation checks', function() {
     });
 
     it('Should throw an error when onSuccess is not a function', function() {
-        return request.get({uri: URI, onSuccess: 'string'}).should.be.rejectedWith('onSuccess must be a function')
+        return request.get({uri: URI, onSuccess: 'string'})
+            .should.be.rejectedWith('onSuccess must be a function')
             .then(() => {
                 should(stub.callCount).eql(0);
             });
     });
     it('Should throw an error when onError is not a function', function() {
-        return request.get({uri: URI, onError: 'string'}).should.be.rejectedWith('onError must be a function')
+        return request.get({uri: URI, onError: 'string'})
+            .should.be.rejectedWith('onError must be a function')
             .then(() => {
                 should(stub.callCount).eql(0);
             });
     });
     it('Should throw an error when retryStrategy is not a function', function() {
-        return request.get({uri: URI, retryStrategy: 'string'}).should.be.rejectedWith('retryStrategy must be a function')
+        return request.get({uri: URI, retryStrategy: 'string'})
+            .should.be.rejectedWith('retryStrategy must be a function')
             .then(() => {
                 should(stub.callCount).eql(0);
             });
@@ -73,14 +78,16 @@ describe('When sending get request with default values', function () {
     });
     it('Should return 200 OK response after 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 1 attempt', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -88,7 +95,8 @@ describe('When sending get request with default values', function () {
     it('Should return an error after 1 attempt', function () {
         const error = new Error('some error');
         stub.rejects(error);
-        return request.get(URI).should.be.rejectedWith(error)
+        return request.get(URI)
+            .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -113,21 +121,24 @@ describe('When sending get request with max value set', function () {
     });
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 1 attempt', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 1 attempt', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -135,7 +146,8 @@ describe('When sending get request with max value set', function () {
     it('Should return an error after 3 attempts', function () {
         const error = new Error('RequestError');
         stub.rejects(error);
-        return request.get(URI, options).should.be.rejectedWith(error)
+        return request.get(URI, options)
+            .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -160,14 +172,16 @@ describe('When sending request with the default max value and retryOn5xx set to 
     });
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 1 attempt', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -192,14 +206,16 @@ describe('When sending request with the default max value and retryOn5xx set to 
     });
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 1 attempt', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -210,7 +226,8 @@ describe('When sending request with the default max value and retryOn5xx set to 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.fulfilledWith(response.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(response.body)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -234,14 +251,16 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
     });
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 3 attempts', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -252,7 +271,8 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -260,7 +280,8 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
     it('Should return an error on rejection (network error) after 3 attempts', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
-        return request.get(URI, options).should.be.rejectedWith(error)
+        return request.get(URI, options)
+            .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -284,14 +305,16 @@ describe('When sending get request with retryOn5xx set to true and simple set to
     });
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 3 attempts', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -302,7 +325,8 @@ describe('When sending get request with retryOn5xx set to true and simple set to
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.fulfilledWith(response.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(response.body)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -310,7 +334,8 @@ describe('When sending get request with retryOn5xx set to true and simple set to
     it('Should return an error on rejection (network error) after 3 attempts', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
-        return request.get(URI, options).should.be.rejectedWith(error)
+        return request.get(URI, options)
+            .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -335,7 +360,8 @@ describe('When setting resolveWithFullResponse=false', function () {
         const options = {resolveWithFullResponse: false};
 
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -344,7 +370,8 @@ describe('When setting resolveWithFullResponse=false', function () {
         const options = {simple: false, resolveWithFullResponse: false};
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.fulfilledWith(STRING_RESPONSE_500.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(STRING_RESPONSE_500.body)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -357,7 +384,8 @@ describe('When setting resolveWithFullResponse=false', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -382,7 +410,8 @@ describe('When setting resolveWithFullResponse=true', function () {
         const options = {resolveWithFullResponse: true};
 
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -391,7 +420,8 @@ describe('When setting resolveWithFullResponse=true', function () {
         const options = {simple: false, resolveWithFullResponse: true};
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.fulfilledWith(STRING_RESPONSE_500)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(STRING_RESPONSE_500)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -400,7 +430,8 @@ describe('When setting resolveWithFullResponse=true', function () {
         const options = {max: 3, retryOn5xx: true, simple: false, resolveWithFullResponse: true};
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -425,7 +456,8 @@ describe('When passing all options as the first argument', function () {
         const options = {uri: URI, resolveWithFullResponse: true};
 
         stub.resolves(GOOD_RESPONSE);
-        return request.get(options).should.be.fulfilledWith(GOOD_RESPONSE)
+        return request.get(options)
+            .should.be.fulfilledWith(GOOD_RESPONSE)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -434,7 +466,8 @@ describe('When passing all options as the first argument', function () {
         const options = {uri: URI, simple: false, resolveWithFullResponse: true};
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(options).should.be.fulfilledWith(STRING_RESPONSE_500)
+        return request.get(options)
+            .should.be.fulfilledWith(STRING_RESPONSE_500)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -447,7 +480,8 @@ describe('When passing all options as the first argument', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -474,7 +508,8 @@ describe('When sending get request with max value set and retryStrategy given', 
 
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
@@ -485,7 +520,8 @@ describe('When sending get request with max value set and retryStrategy given', 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -497,7 +533,8 @@ describe('When sending get request with max value set and retryStrategy given', 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new RequestError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new RequestError(response))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -510,7 +547,8 @@ describe('When sending get request with max value set and retryStrategy given', 
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -544,7 +582,8 @@ describe('When sending request with onSuccess and onError', function () {
         }, options);
 
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
                 should(onSuccess.callCount).eql(1);
@@ -560,7 +599,8 @@ describe('When sending request with onSuccess and onError', function () {
         }, options);
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(3);
                 should(onSuccess.callCount).eql(0);
@@ -580,7 +620,8 @@ describe('When sending request with onSuccess and onError', function () {
         };
 
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI, options)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
                 should(onSuccess.callCount).eql(0);
@@ -591,7 +632,8 @@ describe('When sending request with onSuccess and onError', function () {
     it('Should call onSuccess and onError', function () {
         stub.resolves(STRING_RESPONSE_500);
         stub.onCall(2).resolves(GOOD_RESPONSE);
-        return request.get(URI, options).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI, options)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then((response) => {
                 should(stub.callCount).eql(3);
                 should(onSuccess.callCount).eql(1);
@@ -624,7 +666,8 @@ describe('When throwing an error', function () {
         expectedError.name = 'StatusCodeError';
         expectedError.response = JSON_RESPONSE_500;
         stub.resolves(JSON_RESPONSE_500);
-        return request.get(URI, options).should.be.rejected()
+        return request.get(URI, options)
+            .should.be.rejected()
             .then((error) => {
                 should(error).be.containDeep(expectedError);
                 should(stub.callCount).eql(3);
@@ -638,7 +681,8 @@ describe('When throwing an error', function () {
         expectedError.name = 'StatusCodeError';
         expectedError.response = response;
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejected()
+        return request.get(URI, options)
+            .should.be.rejected()
             .then((error) => {
                 should(error).be.containDeep(expectedError);
                 should(stub.callCount).eql(3);
@@ -653,7 +697,8 @@ describe('When throwing an error', function () {
         expectedError.name = 'StatusCodeError';
         expectedError.response = response;
         stub.resolves(response);
-        return request.get(URI, options).should.be.rejected()
+        return request.get(URI, options)
+            .should.be.rejected()
             .then((error) => {
                 should(error).be.containDeep(expectedError);
                 should(stub.callCount).eql(3);
@@ -680,14 +725,16 @@ describe('When using .defaults', function () {
 
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI).should.be.fulfilledWith(GOOD_RESPONSE.body)
+        return request.get(URI)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).eql(1);
             });
     });
     it('Should return 500 response after 3 attempts', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -698,7 +745,8 @@ describe('When using .defaults', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI).should.be.rejectedWith(new StatusCodeError(response))
+        return request.get(URI)
+            .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -710,7 +758,8 @@ describe('When using .defaults', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, overridingOptions).should.be.fulfilledWith(response.body)
+        return request.get(URI, overridingOptions)
+            .should.be.fulfilledWith(response.body)
             .then((response) => {
                 should(stub.callCount).eql(1);
             });
@@ -719,7 +768,8 @@ describe('When using .defaults', function () {
         const overridingOptions = {max: 5, simple: false};
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, overridingOptions).should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+        return request.get(URI, overridingOptions)
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).eql(5);
             });
@@ -727,7 +777,8 @@ describe('When using .defaults', function () {
     it('Should return an error on rejection (network error) after 3 attempts', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
-        return request.get(URI).should.be.rejectedWith(error)
+        return request.get(URI)
+            .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).eql(3);
             });
@@ -762,7 +813,8 @@ describe('On connection issues', function () {
             .get('/')
             .reply(200, 'body');
 
-        return request.get({uri: URI, max: 3, timeout: 100}).should.be.fulfilledWith('body')
+        return request.get({uri: URI, max: 3, timeout: 100})
+            .should.be.fulfilledWith('body')
             .then(() => {
                 should(getSpy.callCount).eql(3);
                 server.isDone();
@@ -781,13 +833,14 @@ describe('On connection issues', function () {
             .socketDelay(1000)
             .reply(200, 'body');
 
-        return request.get({uri: URI, max: 3, timeout: 1, backoffBase: 100}).should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
+        return request.get({uri: URI, max: 3, timeout: 1, backoffBase: 100})
+            .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(getSpy.callCount).eql(3);
                 server.isDone();
             });
     });
-    it('Should retry on connection timeout', function () {
+    it('Should retry on connection timeout for POST request', function () {
         const server = nock(URI)
             .post('/')
             .socketDelay(1000)
@@ -799,7 +852,8 @@ describe('On connection issues', function () {
             .socketDelay(1000)
             .reply(200, 'body');
 
-        return request({method: 'post', uri: URI, max: 3, timeout: 1, backoffBase: 100}).should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
+        return request({method: 'POST', uri: URI, max: 3, timeout: 1, backoffBase: 100})
+            .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(postSpy.callCount).eql(3);
                 server.isDone();

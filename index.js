@@ -83,6 +83,7 @@ function buildRequestOptions(options) {
     options.originalResolveWithFullResponse = options.resolveWithFullResponse;
     options.simple = false;
     options.resolveWithFullResponse = true;
+    options.method = options.method.toLowerCase();
 
     return options;
 }
