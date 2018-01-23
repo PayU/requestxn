@@ -6,7 +6,7 @@ const defaults = require('lodash.defaults');
 
 const FUNCTIONS = ['retryStrategy', 'onSuccess', 'onError'];
 
-const requester = decorateMethod('get');
+const requester = decorateMethod();
 requester.get = decorateMethod('get');
 requester.head = decorateMethod('head');
 requester.options = decorateMethod('options');
@@ -20,7 +20,7 @@ requester.cookie = rp.cookie;
 requester.forever = rp.forever;
 
 requester.defaults = (defaultOptions) => {
-    const requester = decorateMethod('get', defaultOptions);
+    const requester = decorateMethod(defaultOptions);
     requester.get = decorateMethod('get', defaultOptions);
     requester.head = decorateMethod('head', defaultOptions);
     requester.options = decorateMethod('options', defaultOptions);
@@ -39,7 +39,7 @@ module.exports = requester;
 
 function decorateMethod(method, defaultsOptions = {max: 1}) {
     return (uri, options) => {
-        const $options = buildOptions(uri, options, defaultsOptions);
+        const $options = buildOptions(uri, method, options, defaultsOptions);
         const {max, backoffBase, backoffExponent} = $options;
 
         try {
@@ -52,7 +52,7 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
 
         return retry(() => {
             attempts++;
-            return rp[method]($options)
+            return rp[$options.method]($options)
                 .then(response => handleResponse($options, response, attempts))
                 .catch(error => handleError($options, error, attempts));
         }, {max, backoffBase, backoffExponent})
@@ -60,12 +60,12 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
     };
 }
 
-function buildOptions(uri, options = {}, defaultOptions) {
+function buildOptions(uri, method, options = {}, defaultOptions) {
     if (typeof uri === 'object') {
-        const newOptions = defaults(uri, defaultOptions);
+        const newOptions = defaults({method}, uri, defaultOptions, {method: 'get'});
         return buildRequestOptions(newOptions);
     } else {
-        const newOptions = defaults({uri}, options, defaultOptions);
+        const newOptions = defaults({uri, method}, options, defaultOptions, {method: 'get'});
         return buildRequestOptions(newOptions);
     }
 }

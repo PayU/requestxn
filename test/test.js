@@ -736,14 +736,16 @@ describe('When using .defaults', function () {
 
 describe('On connection issues', function () {
     const sandbox = sinon.sandbox.create();
-    let spy;
+    let getSpy;
+    let postSpy;
     let request;
     before(function () {
-        spy = sandbox.spy(rp, 'get');
+        getSpy = sandbox.spy(rp, 'get');
+        postSpy = sandbox.spy(rp, 'post');
         request = require('../index');
     });
     after(function () {
-        spy.restore();
+        getSpy.restore();
     });
     afterEach(function () {
         sandbox.resetHistory();
@@ -762,7 +764,7 @@ describe('On connection issues', function () {
 
         return request.get({uri: URI, max: 3, timeout: 100}).should.be.fulfilledWith('body')
             .then(() => {
-                should(spy.callCount).eql(3);
+                should(getSpy.callCount).eql(3);
                 server.isDone();
             });
     });
@@ -781,7 +783,25 @@ describe('On connection issues', function () {
 
         return request.get({uri: URI, max: 3, timeout: 1, backoffBase: 100}).should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
-                should(spy.callCount).eql(3);
+                should(getSpy.callCount).eql(3);
+                server.isDone();
+            });
+    });
+    it('Should retry on connection timeout', function () {
+        const server = nock(URI)
+            .post('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .post('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .post('/')
+            .socketDelay(1000)
+            .reply(200, 'body');
+
+        return request({method: 'post', uri: URI, max: 3, timeout: 1, backoffBase: 100}).should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
+            .then(() => {
+                should(postSpy.callCount).eql(3);
                 server.isDone();
             });
     });
