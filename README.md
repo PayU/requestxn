@@ -11,30 +11,63 @@ Wraps request-promise with a retry handler, in order to provide an easy way to s
 
 [![NPM](https://nodei.co/npm/requestxn.png?downloads=true&downloadRank=true&stars=true)][npm-stats]
 
-- [requestXn](#requestxn)
-  - [Options](#options)
-    - [max](#max)
-    - [backoffBase](#backoffbase)
-    - [backoffExponent](#backoffexponent)
-    - [retryOn5xx](#retryon5xx)
-    - [rejectOn5xx](#rejecton5xx)
-    - [retryStrategy](#retrystrategy)
-    - [onSuccess](#onsuccess)
-    - [onError](#onerror)
-    - [Example](#example)
+- [Options](#options)
+  - [max](#max)
+  - [retryOn5xx](#retryon5xx)
+  - [rejectOn5xx](#rejecton5xx)
+  - [retryStrategy](#retrystrategy)
+  - [backoffBase](#backoffbase)
+  - [backoffExponent](#backoffexponent)
+  - [onSuccess](#onsuccess)
+  - [onError](#onerror)
+- [Example](#example)
 
 ## Options
 
-requestxn should support all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
+requestXn supports all [request-promise-native](https://github.com/request/request-promise-native) functionality, so you can pass all options as you would pass them to the original package
 
-In addition to the original *request-promise* options, the following extra options are accepted
+In addition to the original *request-promise* options, the following extra options are available
 
 ### max
 
 Maximum number of attempts. Default: 1
 
+If you would like requestXn to retry on a network error, set this options to a value above 1.
+
 ```js
 max: 1
+```
+
+### retryOn5xx
+
+Retry on 5xx status codes. Default: false
+
+Make requestXn also retry in case of 5xx status codes.
+
+```js
+retryOn5xx: true
+```
+
+### rejectOn5xx
+
+Reject when getting 5xx status code and simple=false. Default: false
+
+By default, requestXn would resolve with the response when simple=false.
+
+By setting this option to true, requestXn behavior is changed to reject on such cases.
+
+```js
+rejectOn5xx: true
+```
+
+### retryStrategy
+
+Custom retry logic function
+
+```js
+retryStrategy: function (response) {
+  // return a boolean
+}
 ```
 
 ### backoffBase
@@ -51,36 +84,6 @@ Exponent to increase backoff on each attempt. Default: 1.1
 
 ```js
 backoffExponent: 1.1
-```
-
-### retryOn5xx
-
-Retry on 5xx status code. Default: false
-
-```js
-retryOn5xx: true
-```
-
-### rejectOn5xx
-
-Reject when getting 5xx status code and simple=false. Default: false
-
-By default, requestXn would resolve with the response when simple=false.
-
-By setting this option to true it would reject on such cases.
-
-```js
-rejectOn5xx: true
-```
-
-### retryStrategy
-
-Custom retry logic function
-
-```js
-retryStrategy: function (response) {
-  // return a boolean
-}
 ```
 
 ### onSuccess
@@ -128,7 +131,7 @@ const options = {
 }
 ```
 
-### Result
+#### Result
 
 ```js
 > request.post(options).then()...
@@ -137,7 +140,7 @@ const options = {
 - "Got status-code 200 on request to http://www.site-with-issues.com"
 ```
 
-### Usage with defaults
+#### Usage with defaults
 
 ```js
 const request = require('requestxn');
