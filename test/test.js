@@ -495,6 +495,20 @@ describe('When passing all options as the first argument', function () {
                 should(stub.callCount).eql(3);
             });
     });
+    it('Should reject on 5xx status code after 3 attempts', function () {
+        const options = {uri: URI, max: 3, retryOn5xx: true, rejectOn5xx: true, simple: false, resolveWithFullResponse: true};
+
+        const response = {
+            statusCode: 500,
+            body: 'body'
+        };
+        stub.resolves(response);
+        return request.get(options)
+            .should.be.rejectedWith(new StatusCodeError(response))
+            .then((response) => {
+                should(stub.callCount).eql(3);
+            });
+    });
 });
 
 describe('When sending get request with max value set and retryStrategy given', function () {
