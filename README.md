@@ -21,9 +21,7 @@ Wraps request-promise with a retry handler, in order to provide an easy way to s
     - [retryStrategy](#retrystrategy)
     - [onSuccess](#onsuccess)
     - [onError](#onerror)
-    - [Usage](#usage)
-    - [Result](#result)
-    - [Usage with defaults](#usage-with-defaults)
+    - [Example](#example)
 
 ## Options
 
@@ -105,7 +103,7 @@ onError: function (options, error, attempts) {
 }
 ```
 
-### Usage
+### Example
 
 ```js
 const request = require('requestxn');
