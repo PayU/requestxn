@@ -53,10 +53,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kobik/requestxn.git"
+    "url": "git+https://github.com/Zooz/requestxn.git"
   },
   "bugs": {
-    "url": "https://github.com/kobik/requestxn/issues"
+    "url": "https://github.com/Zooz/requestxn/issues"
   },
-  "homepage": "https://github.com/kobik/requestnx#readme"
+  "homepage": "https://github.com/Zooz/requestnx#readme"
 }
