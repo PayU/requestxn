@@ -166,14 +166,10 @@ requestWithDefaults.get('http://www.site-with-issues.com').then...
 
 [npm-image]: https://img.shields.io/npm/v/requestxn.svg?style=flat
 [npm-url]: https://npmjs.org/package/requestxn
-[travis-image]: https://travis-ci.org/kobik/requestxn.svg?branch=master
-[travis-url]: https://travis-ci.org/kobik/requestxn
-[coveralls-image]: https://coveralls.io/repos/github/kobik/requestxn/badge.svg?branch=master
-[coveralls-url]: https://coveralls.io/repos/github/kobik/requestxn/badge.svg?branch=master
+[travis-image]: https://travis-ci.org/Zooz/requestxn.svg?branch=master
+[travis-url]: https://travis-ci.org/Zooz/requestxn
+[coveralls-image]: https://coveralls.io/repos/github/Zooz/requestxn/badge.svg?branch=master
+[coveralls-url]: https://coveralls.io/repos/github/Zooz/requestxn/badge.svg?branch=master
 [downloads-image]: http://img.shields.io/npm/dm/requestxn.svg?style=flat
 [downloads-url]: https://npmjs.org/package/requestxn
 [npm-stats]: https://nodei.co/npm/requestxn/
-[codeclimate-maintainability-image]: https://api.codeclimate.com/v1/badges/d7bd5d2253291c57dd69/maintainability
-[codeclimate-maintainability-url]: https://codeclimate.com/github/kobik/requestxn/maintainability
-[codeclimate-coverage-image]: https://api.codeclimate.com/v1/badges/d7bd5d2253291c57dd69/test_coverage
-[codeclimate-coverage-url]: https://codeclimate.com/github/kobik/requestxn/test_coverage
