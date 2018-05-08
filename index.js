@@ -37,10 +37,10 @@ requester.defaults = (defaultOptions) => {
 
 module.exports = requester;
 
-function decorateMethod(method, defaultsOptions = {max: 1}) {
+function decorateMethod(method, defaultsOptions = { max: 1 }) {
     return (uri, options) => {
         const $options = buildOptions(uri, method, options, defaultsOptions);
-        const {max, backoffBase, backoffExponent} = $options;
+        const { max, backoffBase, backoffExponent } = $options;
 
         try {
             validateInput($options);
@@ -55,17 +55,17 @@ function decorateMethod(method, defaultsOptions = {max: 1}) {
             return rp[$options.method]($options)
                 .then(response => handleResponse($options, response, attempts))
                 .catch(error => handleError($options, error, attempts));
-        }, {max, backoffBase, backoffExponent})
+        }, { max, backoffBase, backoffExponent })
             .then(response => buildResponse($options, response, attempts));
     };
 }
 
 function buildOptions(uri, method, options = {}, defaultOptions) {
     if (typeof uri === 'object') {
-        const newOptions = defaults({method}, uri, defaultOptions, {method: 'get'});
+        const newOptions = defaults({ method }, uri, defaultOptions, { method: 'get' });
         return buildRequestOptions(newOptions);
     } else {
-        const newOptions = defaults({uri, method}, options, defaultOptions, {method: 'get'});
+        const newOptions = defaults({ uri, method }, options, defaultOptions, { method: 'get' });
         return buildRequestOptions(newOptions);
     }
 }
@@ -89,8 +89,8 @@ function buildRequestOptions(options) {
 }
 
 function handleResponse(options, response, attempts) {
-    const {retryOn5xx, retryStrategy, originalSimpleValue, rejectOn5xx, max} = options;
-    const {statusCode} = response;
+    const { retryOn5xx, retryStrategy, originalSimpleValue, rejectOn5xx, max } = options;
+    const { statusCode } = response;
 
     if (rejectOn5xx !== true && attempts === max) {
         return response;
@@ -106,19 +106,16 @@ function handleResponse(options, response, attempts) {
     return response;
 }
 
-function handleError(options, error, attempts) {
-    const {onError} = options;
+async function handleError(options, error, attempts) {
+    const { onError } = options;
 
-    if (onError) {
-        onError(options, error, attempts);
-    }
-
+    onError && await onError(options, error, attempts);
     throw error;
 }
 
-function buildResponse(options, response, attempts) {
-    const {onSuccess, onError, originalSimpleValue, originalResolveWithFullResponse} = options;
-    const {statusCode} = response;
+async function buildResponse(options, response, attempts) {
+    const { onSuccess, onError, originalSimpleValue, originalResolveWithFullResponse } = options;
+    const { statusCode } = response;
 
     if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
         const error = new StatusCodeError(response);
@@ -126,7 +123,7 @@ function buildResponse(options, response, attempts) {
         throw error;
     }
 
-    onSuccess && onSuccess(options, response, attempts);
+    onSuccess && await onSuccess(options, response, attempts)
 
     if (originalResolveWithFullResponse === true) {
         response.attempts = attempts;
