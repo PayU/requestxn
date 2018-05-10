@@ -106,31 +106,35 @@ function handleResponse(options, response, attempts) {
     return response;
 }
 
-async function handleError(options, error, attempts) {
+function handleError(options, error, attempts) {
     const { onError } = options;
 
-    onError && await onError(options, error, attempts);
-    throw error;
+    return Promise.resolve()
+        .then(() => onError && onError(options, error, attempts))
+        .then(() => Promise.reject(error))
 }
 
-async function buildResponse(options, response, attempts) {
+function buildResponse(options, response, attempts) {
     const { onSuccess, onError, originalSimpleValue, originalResolveWithFullResponse } = options;
     const { statusCode } = response;
 
     if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
         const error = new StatusCodeError(response);
-        onError && onError(options, error, attempts);
-        throw error;
+        return Promise.resolve()
+            .then(() => onError && onError(options, error, attempts))
+            .then(() => Promise.reject(error));
     }
 
-    onSuccess && await onSuccess(options, response, attempts)
-
-    if (originalResolveWithFullResponse === true) {
-        response.attempts = attempts;
-        return response;
-    } else {
-        return response.body;
-    }
+    return Promise.resolve()
+        .then(() => onSuccess && onSuccess(options, response, attempts))
+        .then(() => {
+            if (originalResolveWithFullResponse === true) {
+                response.attempts = attempts;
+                return response;
+            } else {
+                return response.body;
+            }
+        })
 }
 
 function isStatusCodeFailure(simple, statusCode) {
