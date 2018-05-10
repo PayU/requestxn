@@ -1,11 +1,12 @@
 module.exports = class CustomError extends Error {
-    constructor (response) {
+    constructor(response) {
         // handle case simple: false
-        const {statusCode, body} = response;
+        const { statusCode, body } = response;
         const message = `${statusCode} - "${stringifyBody(body)}"`;
         // Calling parent constructor of base Error class.
         super(message);
 
+        this.statusCode = response.statusCode;
         this.response = response;
 
         // Saving class name in the property of our custom error as a shortcut.
