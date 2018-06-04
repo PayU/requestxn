@@ -863,6 +863,27 @@ describe('On connection issues', function () {
                 should(server.isDone()).be.true;
             });
     });
+
+    it('Should not retry on connection timeout when disableTimeoutRetry is true', function () {
+        const server = nock(URI)
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body');
+
+        return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, disableTimeoutRetry: true })
+            .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
+            .then(() => {
+                should(getSpy.callCount).be.eql(1);
+                should(server.isDone()).be.true;
+            });
+    });
+
     it('Should retry on connection timeout for POST request', function () {
         const server = nock(URI)
             .post('/')

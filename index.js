@@ -40,7 +40,7 @@ module.exports = requester;
 function decorateMethod(method, defaultsOptions = { max: 1 }) {
     return (uri, options) => {
         const $options = buildOptions(uri, method, options, defaultsOptions);
-        const { max, backoffBase, backoffExponent } = $options;
+        const { max, backoffBase, backoffExponent, disableTimeoutRetry } = $options;
 
         try {
             validateInput($options);
@@ -55,7 +55,7 @@ function decorateMethod(method, defaultsOptions = { max: 1 }) {
             return rp[$options.method]($options)
                 .then(response => handleResponse($options, response, attempts))
                 .catch(error => handleError($options, error, attempts));
-        }, { max, backoffBase, backoffExponent })
+        }, { max, backoffBase, backoffExponent, disableTimeoutRetry })
             .then(response => buildResponse($options, response, attempts));
     };
 }
