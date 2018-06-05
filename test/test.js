@@ -864,7 +864,7 @@ describe('On connection issues', function () {
             });
     });
 
-    it('Should not retry on connection timeout when disableTimeoutRetry is true', function () {
+    it('Should not retry on read timeout when excludeErrorsFromRetry has socket time value', function () {
         const server = nock(URI)
             .get('/')
             .socketDelay(1000)
@@ -876,10 +876,47 @@ describe('On connection issues', function () {
             .socketDelay(1000)
             .reply(200, 'body');
 
-        return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, disableTimeoutRetry: true })
+        return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['ESOCKETTIMEDOUT'] })
             .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(getSpy.callCount).be.eql(1);
+                should(server.isDone()).be.true;
+            });
+    });
+
+    it('Should not retry on connection timeout when excludeErrorsFromRetry connection socket time value', function () {
+        const server = nock(URI)
+            .get('/')
+            .replyWithError({code: 'ETIMEDOUT'})
+            .get('/')
+            .reply(200, 'body')
+            .get('/')
+            .reply(200, 'body');
+
+        return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['ETIMEDOUT'] })
+            .should.be.rejected()
+            .then(() => {
+                should(getSpy.callCount).be.eql(1);
+                should(server.isDone()).be.true;
+            });
+    });
+
+    it('Should retry on connection timeout when excludeErrorsFromRetry is exists but does not have the specific error', function() {
+        const server = nock(URI)
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body')
+            .get('/')
+            .socketDelay(1000)
+            .reply(200, 'body');
+
+        return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['some_error'] })
+            .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
+            .then(() => {
+                should(getSpy.callCount).be.eql(3);
                 should(server.isDone()).be.true;
             });
     });
