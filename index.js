@@ -107,16 +107,23 @@ function handleResponse(options, response, attempts) {
 }
 
 function handleError(options, error, attempts) {
-    const { onError } = options;
+    const { onError, excludeErrorsFromRetry } = options;
+
+    let errorCode = error.error && error.error.code;
+    let excludeError = Array.isArray(excludeErrorsFromRetry) && excludeErrorsFromRetry.includes(errorCode);
 
     return Promise.resolve()
         .then(() => onError && onError(options, error, attempts))
-        .then(() => Promise.reject(error))
+        .then(() => { return excludeError ? Promise.resolve(error) : Promise.reject(error) });
 }
 
 function buildResponse(options, response, attempts) {
     const { onSuccess, onError, originalSimpleValue, originalResolveWithFullResponse } = options;
     const { statusCode } = response;
+
+    if (response instanceof Error) {
+        return Promise.reject(response);
+    }
 
     if (isStatusCodeFailure(originalSimpleValue, statusCode)) {
         const error = new StatusCodeError(response);
