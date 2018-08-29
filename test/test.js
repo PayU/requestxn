@@ -806,6 +806,12 @@ describe('When using .defaults', function () {
                 should(stub.callCount).be.eql(3);
             });
     });
+
+    it('Should support nested defaults. ', function () {
+        const request = require('../index');
+        const rt1 = request.defaults({ json: true });
+        should.doesNotThrow(() => rt1.defaults({ baseUrl: 'http://127.0.0.1/' }));
+    });
 });
 
 describe('On connection issues', function () {
