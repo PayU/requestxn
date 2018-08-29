@@ -36,6 +36,8 @@ Maximum number of attempts. Default: 1
 
 If you would like requestXn to retry on a network error, set this options to a value above 1.
 
+This handles all non-HTTP errors including ENOTFOUND, ECONNRESET, ECONNREFUSED, and ETIMEOUT. 
+
 ```js
 max: 1
 ```
