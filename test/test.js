@@ -806,7 +806,7 @@ describe('When using .defaults', function () {
                 should(stub.callCount).be.eql(3);
             });
     });
-    describe('Should support nested defaults', async function () {
+    describe('Should support nested defaults', function () {
         const overridingOptions = { max: 2, retryOn5xx: false };
         let requestWithNewDefaults;
 
