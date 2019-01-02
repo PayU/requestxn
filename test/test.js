@@ -24,7 +24,7 @@ const JSON_RESPONSE_500 = {
 // TODO: Add tests for all methods (Upper and lower cases)
 // TODO: Add tests for calling the function directly by passing method in options
 describe('Validation checks', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
 
@@ -63,7 +63,7 @@ describe('Validation checks', function () {
 });
 
 describe('When sending get request with default values', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -109,7 +109,7 @@ describe('When sending get request with max value set', function () {
     let stub;
     let request;
     before(function () {
-        sandbox = sinon.sandbox.create();
+        sandbox = sinon.createSandbox();
         stub = sandbox.stub(rp, 'get');
         request = require('../index');
     });
@@ -156,7 +156,7 @@ describe('When sending get request with max value set', function () {
 
 describe('When sending request with the default max value and retryOn5xx set to true', function () {
     const options = { retryOn5xx: true };
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
 
@@ -190,7 +190,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
 
 describe('When sending request with the default max value and retryOn5xx set to true', function () {
     const options = { retryOn5xx: true, simple: false };
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
 
@@ -245,7 +245,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
 
 describe('When sending get request with max value set to 3 and retryOn5xx set to true', function () {
     const options = { max: 3, retryOn5xx: true };
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -299,7 +299,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
 
 describe('When sending get request with retryOn5xx set to true and simple set to false', function () {
     const options = { max: 3, retryOn5xx: true, simple: false };
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -352,7 +352,7 @@ describe('When sending get request with retryOn5xx set to true and simple set to
 });
 
 describe('When setting resolveWithFullResponse=false', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -402,7 +402,7 @@ describe('When setting resolveWithFullResponse=false', function () {
 });
 
 describe('When setting resolveWithFullResponse=true', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -448,7 +448,7 @@ describe('When setting resolveWithFullResponse=true', function () {
 });
 
 describe('When passing all options as the first argument', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let request;
     before(function () {
@@ -513,7 +513,7 @@ describe('When passing all options as the first argument', function () {
 
 describe('When sending get request with max value set and retryStrategy given', function () {
     const fn = (response) => response.statusCode === 401;
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     const options = { max: 3, retryStrategy: fn };
     let request;
     let stub;
@@ -579,7 +579,7 @@ describe('When sending get request with max value set and retryStrategy given', 
 });
 
 describe('When sending request with onSuccess and onError', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     const onSuccess = sandbox.stub();
     const onError = sandbox.stub();
     const options = { max: 3, retryOn5xx: true, onSuccess, onError };
@@ -666,7 +666,7 @@ describe('When sending request with onSuccess and onError', function () {
 });
 
 describe('When throwing an error', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     const onSuccess = sandbox.stub();
     const onError = sandbox.stub();
     const options = { max: 3, retryOn5xx: true, onSuccess, onError };
@@ -731,7 +731,7 @@ describe('When throwing an error', function () {
 
 describe('When using .defaults', function () {
     const options = { max: 3, retryOn5xx: true };
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let stub;
     let requestWithDefaults;
 
@@ -837,7 +837,7 @@ describe('When using .defaults', function () {
 });
 
 describe('On request errors', function () {
-    const sandbox = sinon.sandbox.create();
+    const sandbox = sinon.createSandbox();
     let getSpy;
     let postSpy;
     let request;
