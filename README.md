@@ -66,12 +66,12 @@ rejectOn5xx: true
 
 ### retryStrategy
 
-Custom retry logic function
+Custom retry logic function. Receives a response object and returns a boolean.
 
 ```js
-retryStrategy: function (response) {
-  // return a boolean
-}
+// Retry is HTTP status is "Too many requests" or a server error.
+retryStrategy: res => res.statusCode === 429 || res.statusCode >= 500;
+
 ```
 
 ### backoffBase
