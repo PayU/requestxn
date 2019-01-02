@@ -733,11 +733,11 @@ describe('When using .defaults', function () {
     const options = { max: 3, retryOn5xx: true };
     const sandbox = sinon.sandbox.create();
     let stub;
-    let request;
+    let requestWithDefaults;
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index').defaults(options);
+        requestWithDefaults = require('../index').defaults(options);
     });
     after(function () {
         stub.restore();
@@ -748,7 +748,7 @@ describe('When using .defaults', function () {
 
     it('Should return 200 OK response 1 attempt', function () {
         stub.resolves(GOOD_RESPONSE);
-        return request.get(URI)
+        return requestWithDefaults.get(URI)
             .should.be.fulfilledWith(GOOD_RESPONSE.body)
             .then(() => {
                 should(stub.callCount).be.eql(1);
@@ -756,7 +756,7 @@ describe('When using .defaults', function () {
     });
     it('Should return 500 response after 3 attempts', function () {
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI)
+        return requestWithDefaults.get(URI)
             .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
             .then((response) => {
                 should(stub.callCount).be.eql(3);
@@ -768,7 +768,7 @@ describe('When using .defaults', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI)
+        return requestWithDefaults.get(URI)
             .should.be.rejectedWith(new StatusCodeError(response))
             .then((response) => {
                 should(stub.callCount).be.eql(1);
@@ -781,7 +781,7 @@ describe('When using .defaults', function () {
             body: 'body'
         };
         stub.resolves(response);
-        return request.get(URI, overridingOptions)
+        return requestWithDefaults.get(URI, overridingOptions)
             .should.be.fulfilledWith(response.body)
             .then((response) => {
                 should(stub.callCount).be.eql(1);
@@ -791,7 +791,7 @@ describe('When using .defaults', function () {
         const overridingOptions = { max: 5, simple: false };
 
         stub.resolves(STRING_RESPONSE_500);
-        return request.get(URI, overridingOptions)
+        return requestWithDefaults.get(URI, overridingOptions)
             .should.be.fulfilledWith(STRING_RESPONSE_500.body)
             .then((response) => {
                 should(stub.callCount).be.eql(5);
@@ -800,15 +800,43 @@ describe('When using .defaults', function () {
     it('Should return an error on rejection (network error) after 3 attempts', function () {
         const error = new Error('getaddrinfo ENOTFOUND');
         stub.rejects(error);
-        return request.get(URI)
+        return requestWithDefaults.get(URI)
             .should.be.rejectedWith(error)
             .then((response) => {
                 should(stub.callCount).be.eql(3);
             });
     });
+    describe('Should support nested defaults', async function () {
+        const overridingOptions = { max: 2, retryOn5xx: false };
+        let requestWithNewDefaults;
+
+        before(function () {
+            requestWithNewDefaults = requestWithDefaults.defaults(overridingOptions);
+        });
+
+        it('Should apply new max value', function () {
+            const error = new Error('getaddrinfo ENOTFOUND');
+            stub.rejects(error);
+
+            return requestWithNewDefaults.get(URI)
+                .should.be.rejectedWith(error)
+                .then((response) => {
+                    should(stub.callCount).be.eql(2);
+                });
+        });
+        it('Should not retry on 5xx', function () {
+            stub.resolves(STRING_RESPONSE_500);
+
+            return requestWithNewDefaults.get(URI)
+                .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+                .then(() => {
+                    should(stub.callCount).be.eql(1);
+                });
+        });
+    });
 });
 
-describe('On connection issues', function () {
+describe('On request errors', function () {
     const sandbox = sinon.sandbox.create();
     let getSpy;
     let postSpy;
@@ -819,19 +847,18 @@ describe('On connection issues', function () {
         request = require('../index');
     });
     after(function () {
-        getSpy.restore();
+        sandbox.restore();
     });
     afterEach(function () {
         sandbox.resetHistory();
         nock.cleanAll();
     });
 
-    it('Should retry on connection error', function () {
-        const error = new Error('Chuck Norris doesn`t get exceptions, exceptions gets Chuck Norris');
+    it('Should retry on request error', function () {
+        const error = new Error('Chuck Norris doesn\'t get exceptions, exceptions gets Chuck Norris');
         const server = nock(URI)
             .get('/')
-            .replyWithError(error)
-            .get('/')
+            .times(2)
             .replyWithError(error)
             .get('/')
             .reply(200, 'body');
@@ -840,104 +867,85 @@ describe('On connection issues', function () {
             .should.be.fulfilledWith('body')
             .then(() => {
                 should(getSpy.callCount).be.eql(3);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 
     it('Should retry on connection timeout', function () {
         const server = nock(URI)
             .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body');
+            .times(3)
+            .replyWithError(socketTimeoutError);
 
         return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100 })
             .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(getSpy.callCount).be.eql(3);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 
     it('Should not retry on read timeout when excludeErrorsFromRetry has socket time value', function () {
         const server = nock(URI)
             .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body');
+            .replyWithError(socketTimeoutError);
 
         return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['ESOCKETTIMEDOUT'] })
             .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(getSpy.callCount).be.eql(1);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 
     it('Should not retry on connection timeout when excludeErrorsFromRetry connection socket time value', function () {
         const server = nock(URI)
             .get('/')
-            .replyWithError({code: 'ETIMEDOUT'})
-            .get('/')
-            .reply(200, 'body')
-            .get('/')
-            .reply(200, 'body');
+            .replyWithError(timeoutError);
 
         return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['ETIMEDOUT'] })
             .should.be.rejected()
             .then(() => {
                 should(getSpy.callCount).be.eql(1);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 
-    it('Should retry on connection timeout when excludeErrorsFromRetry is exists but does not have the specific error', function() {
+    it('Should retry on connection timeout when excludeErrorsFromRetry is exists but does not have the specific error', function () {
         const server = nock(URI)
             .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .get('/')
-            .socketDelay(1000)
-            .reply(200, 'body');
+            .times(3)
+            .replyWithError(socketTimeoutError);
 
         return request.get({ uri: URI, max: 3, timeout: 1, backoffBase: 100, excludeErrorsFromRetry: ['some_error'] })
             .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(getSpy.callCount).be.eql(3);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 
     it('Should retry on connection timeout for POST request', function () {
         const server = nock(URI)
             .post('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .post('/')
-            .socketDelay(1000)
-            .reply(200, 'body')
-            .post('/')
-            .socketDelay(1000)
-            .reply(200, 'body');
+            .times(3)
+            .replyWithError(socketTimeoutError);
 
-        return request({ method: 'POST', uri: URI, max: 3, timeout: 1, backoffBase: 100 })
+        return request({ method: 'post', uri: URI, max: 3, timeout: 1, backoffBase: 100 })
             .should.be.rejectedWith('Error: ESOCKETTIMEDOUT')
             .then(() => {
                 should(postSpy.callCount).be.eql(3);
-                should(server.isDone()).be.true;
+                should(server.pendingMocks()).have.lengthOf(0);
             });
     });
 });
+
+const socketTimeoutError = new Error('ESOCKETTIMEDOUT');
+socketTimeoutError.code = 'ESOCKETTIMEDOUT';
+
+const notFoundError = new Error('ENOTFOUND');
+notFoundError.code = 'ENOTFOUND';
+
+const timeoutError = new Error('ETIMEDOUT');
+timeoutError.code = 'ETIMEDOUT';
+
