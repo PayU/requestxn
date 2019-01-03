@@ -64,12 +64,14 @@ function decorateMethod(method, defaultsOptions) {
     };
 }
 
-function buildOptions(uri, method = 'get', options = {}, defaultOptions = {}) {
+function buildOptions(uri, presetMethod, options = {}, defaultOptions = {}) {
     if (typeof uri === 'object') {
-        const newOptions = Object.assign({ method, max: 1 }, defaultOptions, uri);
+        const { method = 'get', ...rest } = uri;
+        const newOptions = Object.assign({ max: 1 }, defaultOptions, { method: presetMethod || method, ...rest });
         return buildRequestOptions(newOptions);
     } else {
-        const newOptions = Object.assign({ method, max: 1 }, defaultOptions, options, { uri });
+        const method = presetMethod || 'get';
+        const newOptions = Object.assign({ max: 1 }, defaultOptions, options, { method, uri });
         return buildRequestOptions(newOptions);
     }
 }

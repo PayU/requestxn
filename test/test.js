@@ -62,6 +62,135 @@ describe('Validation checks', function () {
     });
 });
 
+describe('When calling the exported object directly', async function () {
+    const sandbox = sinon.createSandbox();
+    let getStub;
+    let postStub;
+    let request;
+    before(function () {
+        getStub = sandbox.stub(rp, 'get');
+        postStub = sandbox.stub(rp, 'post');
+        request = require('../index');
+    });
+    after(function () {
+        sandbox.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+    it('Should send a get request', async function () {
+        getStub.resolves(GOOD_RESPONSE);
+        return request(URI)
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
+            .then(() => {
+                should(getStub.callCount).be.eql(1);
+            });
+    });
+    it('Should use options.method when exists', async function () {
+        postStub.resolves(GOOD_RESPONSE);
+        return request({ method: 'post', uri: URI })
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
+            .then(() => {
+                should(postStub.callCount).be.eql(1);
+            });
+    });
+});
+
+describe('When calling a method directly', async function () {
+    const sandbox = sinon.createSandbox();
+    let postStub;
+    let request;
+    before(function () {
+        postStub = sandbox.stub(rp, 'post');
+        request = require('../index');
+    });
+    after(function () {
+        sandbox.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+
+    describe('And passing options', async function () {
+        it('Should use the called method', async function () {
+            postStub.resolves(GOOD_RESPONSE);
+            return request.post({ uri: URI })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(postStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing another method in options', async function () {
+        it('Should use the called method', async function () {
+            postStub.resolves(GOOD_RESPONSE);
+            return request.post({ uri: URI, method: 'put' })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(postStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing URI without options', async function () {
+        it('Should use the called method', async function () {
+            postStub.resolves(GOOD_RESPONSE);
+            return request.post(URI)
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(postStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing URI with options', async function () {
+        it('Should use the called method', async function () {
+            postStub.resolves(GOOD_RESPONSE);
+            return request.post(URI, { timeout: 1000 })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(postStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing URI with another method in options', async function () {
+        it('Should use the called method', async function () {
+            postStub.resolves(GOOD_RESPONSE);
+            return request.post(URI, { method: 'put' })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(postStub.callCount).be.eql(1);
+                });
+        });
+    });
+});
+
+describe('When calling a method and passing another method in options', async function () {
+    const sandbox = sinon.createSandbox();
+    let stub;
+    let request;
+    before(function () {
+        stub = sandbox.stub(rp, 'get');
+        request = require('../index');
+    });
+    after(function () {
+        stub.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+    });
+    it('Should send a get request', async function () {
+        stub.resolves(GOOD_RESPONSE);
+        return request.get({ uri: URI, method: 'post' })
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
+            .then(() => {
+                should(stub.callCount).be.eql(1);
+            });
+    });
+});
+
 describe('When sending get request with default values', function () {
     const sandbox = sinon.createSandbox();
     let stub;
