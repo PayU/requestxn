@@ -6,9 +6,6 @@
 <!-- [![Test Coverage][codeclimate-coverage-image]][codeclimate-coverage-url] -->
 
 # requestXn
-
-**Notice** As from version 3.0.0 only node versions 8 and above are supported
-
 Wraps request-promise with a retry handler, in order to provide an easy way to send requests with retries and promises.
 
 [![NPM](https://nodei.co/npm/requestxn.png?downloads=true&downloadRank=true&stars=true)][npm-stats]

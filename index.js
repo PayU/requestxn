@@ -2,7 +2,6 @@ const rp = require('request-promise-native');
 const retry = require('./retry');
 const StatusCodeError = require('./errors/StatusCodeError');
 const RequestError = require('./errors/RequestError');
-const defaults = require('lodash.defaults');
 
 const FUNCTIONS = ['retryStrategy', 'onSuccess', 'onError'];
 
@@ -19,8 +18,8 @@ requester.jar = rp.jar;
 requester.cookie = rp.cookie;
 requester.forever = rp.forever;
 
-requester.defaults = (defaultOptions) => {
-    const requester = decorateMethod(defaultOptions);
+function defaults(defaultOptions) {
+    const requester = decorateMethod(undefined, defaultOptions);
     requester.get = decorateMethod('get', defaultOptions);
     requester.head = decorateMethod('head', defaultOptions);
     requester.options = decorateMethod('options', defaultOptions);
@@ -32,12 +31,17 @@ requester.defaults = (defaultOptions) => {
     requester.jar = rp.jar;
     requester.cookie = rp.cookie;
     requester.forever = rp.forever;
+    requester.defaults = (newDefaultOptions) => {
+        return defaults(Object.assign({}, defaultOptions, newDefaultOptions));
+    };
     return requester;
-};
+}
+
+requester.defaults = defaults;
 
 module.exports = requester;
 
-function decorateMethod(method, defaultsOptions = { max: 1 }) {
+function decorateMethod(method, defaultsOptions) {
     return (uri, options) => {
         const $options = buildOptions(uri, method, options, defaultsOptions);
         const { max, backoffBase, backoffExponent } = $options;
@@ -60,12 +64,14 @@ function decorateMethod(method, defaultsOptions = { max: 1 }) {
     };
 }
 
-function buildOptions(uri, method, options = {}, defaultOptions) {
+function buildOptions(uri, presetMethod, options = {}, defaultOptions = {}) {
     if (typeof uri === 'object') {
-        const newOptions = defaults({ method }, uri, defaultOptions, { method: 'get' });
+        const method = presetMethod || uri.method || 'get';
+        const newOptions = Object.assign({ max: 1 }, defaultOptions, uri, { method });
         return buildRequestOptions(newOptions);
     } else {
-        const newOptions = defaults({ uri, method }, options, defaultOptions, { method: 'get' });
+        const method = presetMethod || 'get';
+        const newOptions = Object.assign({ max: 1 }, defaultOptions, options, { method, uri });
         return buildRequestOptions(newOptions);
     }
 }
@@ -141,7 +147,7 @@ function buildResponse(options, response, attempts) {
             } else {
                 return response.body;
             }
-        })
+        });
 }
 
 function isStatusCodeFailure(simple, statusCode) {
