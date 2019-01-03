@@ -66,8 +66,8 @@ function decorateMethod(method, defaultsOptions) {
 
 function buildOptions(uri, presetMethod, options = {}, defaultOptions = {}) {
     if (typeof uri === 'object') {
-        const { method = 'get', ...rest } = uri;
-        const newOptions = Object.assign({ max: 1 }, defaultOptions, { method: presetMethod || method, ...rest });
+        const method = presetMethod || uri.method || 'get';
+        const newOptions = Object.assign({ max: 1 }, defaultOptions, uri, { method });
         return buildRequestOptions(newOptions);
     } else {
         const method = presetMethod || 'get';
