@@ -62,7 +62,7 @@ describe('Validation checks', function () {
     });
 });
 
-describe('When calling the exported object directly', async function () {
+describe('When calling the exported object directly', function () {
     const sandbox = sinon.createSandbox();
     let getStub;
     let postStub;
@@ -78,7 +78,7 @@ describe('When calling the exported object directly', async function () {
     afterEach(function () {
         sandbox.resetHistory();
     });
-    it('Should send a get request', async function () {
+    it('Should send a get request', function () {
         getStub.resolves(GOOD_RESPONSE);
         return request(URI)
             .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -86,7 +86,7 @@ describe('When calling the exported object directly', async function () {
                 should(getStub.callCount).be.eql(1);
             });
     });
-    it('Should use options.method when exists', async function () {
+    it('Should use options.method when exists', function () {
         postStub.resolves(GOOD_RESPONSE);
         return request({ method: 'post', uri: URI })
             .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -96,7 +96,7 @@ describe('When calling the exported object directly', async function () {
     });
 });
 
-describe('When calling a method directly', async function () {
+describe('When calling a method directly', function () {
     const sandbox = sinon.createSandbox();
     let postStub;
     let request;
@@ -111,8 +111,8 @@ describe('When calling a method directly', async function () {
         sandbox.resetHistory();
     });
 
-    describe('And passing options', async function () {
-        it('Should use the called method', async function () {
+    describe('And passing options', function () {
+        it('Should use the called method', function () {
             postStub.resolves(GOOD_RESPONSE);
             return request.post({ uri: URI })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -122,8 +122,8 @@ describe('When calling a method directly', async function () {
         });
     });
 
-    describe('And passing another method in options', async function () {
-        it('Should use the called method', async function () {
+    describe('And passing another method in options', function () {
+        it('Should use the called method', function () {
             postStub.resolves(GOOD_RESPONSE);
             return request.post({ uri: URI, method: 'put' })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -133,8 +133,8 @@ describe('When calling a method directly', async function () {
         });
     });
 
-    describe('And passing URI without options', async function () {
-        it('Should use the called method', async function () {
+    describe('And passing URI without options', function () {
+        it('Should use the called method', function () {
             postStub.resolves(GOOD_RESPONSE);
             return request.post(URI)
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -144,8 +144,8 @@ describe('When calling a method directly', async function () {
         });
     });
 
-    describe('And passing URI with options', async function () {
-        it('Should use the called method', async function () {
+    describe('And passing URI with options', function () {
+        it('Should use the called method', function () {
             postStub.resolves(GOOD_RESPONSE);
             return request.post(URI, { timeout: 1000 })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -155,8 +155,8 @@ describe('When calling a method directly', async function () {
         });
     });
 
-    describe('And passing URI with another method in options', async function () {
-        it('Should use the called method', async function () {
+    describe('And passing URI with another method in options', function () {
+        it('Should use the called method', function () {
             postStub.resolves(GOOD_RESPONSE);
             return request.post(URI, { method: 'put' })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
@@ -167,7 +167,7 @@ describe('When calling a method directly', async function () {
     });
 });
 
-describe('When calling a method and passing another method in options', async function () {
+describe('When calling a method and passing another method in options', function () {
     const sandbox = sinon.createSandbox();
     let stub;
     let request;
@@ -181,7 +181,7 @@ describe('When calling a method and passing another method in options', async fu
     afterEach(function () {
         sandbox.resetHistory();
     });
-    it('Should send a get request', async function () {
+    it('Should send a get request', function () {
         stub.resolves(GOOD_RESPONSE);
         return request.get({ uri: URI, method: 'post' })
             .should.be.fulfilledWith(GOOD_RESPONSE.body)
