@@ -65,11 +65,11 @@ describe('Validation checks', function () {
 describe('When calling the exported object directly', function () {
     const sandbox = sinon.createSandbox();
     let getStub;
-    let postStub;
+    let putStub;
     let request;
     before(function () {
-        getStub = sandbox.stub(rp, 'get');
-        postStub = sandbox.stub(rp, 'post');
+        getStub = sandbox.stub(rp, 'get').resolves(GOOD_RESPONSE);
+        putStub = sandbox.stub(rp, 'put').resolves(GOOD_RESPONSE);
         request = require('../index');
     });
     after(function () {
@@ -78,30 +78,54 @@ describe('When calling the exported object directly', function () {
     afterEach(function () {
         sandbox.resetHistory();
     });
-    it('Should send a get request', function () {
-        getStub.resolves(GOOD_RESPONSE);
-        return request(URI)
-            .should.be.fulfilledWith(GOOD_RESPONSE.body)
-            .then(() => {
-                should(getStub.callCount).be.eql(1);
-            });
+
+    describe('And passing options', function () {
+        it('Should use "get" method', function () {
+            return request({ uri: URI })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(getStub.callCount).be.eql(1);
+                });
+        });
     });
-    it('Should use options.method when exists', function () {
-        postStub.resolves(GOOD_RESPONSE);
-        return request({ method: 'post', uri: URI })
-            .should.be.fulfilledWith(GOOD_RESPONSE.body)
-            .then(() => {
-                should(postStub.callCount).be.eql(1);
-            });
+
+    describe('And passing another method in options', function () {
+        it('Should use options.method', function () {
+            return request({ uri: URI, method: 'put' })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(putStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing URI without options', function () {
+        it('Should use "get" method', function () {
+            return request(URI)
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(getStub.callCount).be.eql(1);
+                });
+        });
+    });
+
+    describe('And passing URI with options', function () {
+        it('Should use "get" method', function () {
+            return request(URI, { timeout: 1000 })
+                .should.be.fulfilledWith(GOOD_RESPONSE.body)
+                .then(() => {
+                    should(getStub.callCount).be.eql(1);
+                });
+        });
     });
 });
 
-describe('When calling a method directly', function () {
+describe('When calling a method', function () {
     const sandbox = sinon.createSandbox();
     let postStub;
     let request;
     before(function () {
-        postStub = sandbox.stub(rp, 'post');
+        postStub = sandbox.stub(rp, 'post').resolves(GOOD_RESPONSE);
         request = require('../index');
     });
     after(function () {
@@ -113,7 +137,6 @@ describe('When calling a method directly', function () {
 
     describe('And passing options', function () {
         it('Should use the called method', function () {
-            postStub.resolves(GOOD_RESPONSE);
             return request.post({ uri: URI })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
                 .then(() => {
@@ -124,7 +147,6 @@ describe('When calling a method directly', function () {
 
     describe('And passing another method in options', function () {
         it('Should use the called method', function () {
-            postStub.resolves(GOOD_RESPONSE);
             return request.post({ uri: URI, method: 'put' })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
                 .then(() => {
@@ -135,7 +157,6 @@ describe('When calling a method directly', function () {
 
     describe('And passing URI without options', function () {
         it('Should use the called method', function () {
-            postStub.resolves(GOOD_RESPONSE);
             return request.post(URI)
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
                 .then(() => {
@@ -146,7 +167,6 @@ describe('When calling a method directly', function () {
 
     describe('And passing URI with options', function () {
         it('Should use the called method', function () {
-            postStub.resolves(GOOD_RESPONSE);
             return request.post(URI, { timeout: 1000 })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
                 .then(() => {
@@ -157,7 +177,6 @@ describe('When calling a method directly', function () {
 
     describe('And passing URI with another method in options', function () {
         it('Should use the called method', function () {
-            postStub.resolves(GOOD_RESPONSE);
             return request.post(URI, { method: 'put' })
                 .should.be.fulfilledWith(GOOD_RESPONSE.body)
                 .then(() => {
