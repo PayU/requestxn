@@ -31,7 +31,9 @@ function defaults(defaultOptions) {
     requester.jar = rp.jar;
     requester.cookie = rp.cookie;
     requester.forever = rp.forever;
-    requester.defaults = defaults;
+    requester.defaults = (newDefaultOptions) => {
+        return defaults(Object.assign({}, defaultOptions, newDefaultOptions));
+    };
     return requester;
 }
 

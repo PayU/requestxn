@@ -807,7 +807,7 @@ describe('When using .defaults', function () {
             });
     });
     describe('Should support nested defaults', function () {
-        const overridingOptions = { max: 2, retryOn5xx: false };
+        const overridingOptions = { max: 2 };
         let requestWithNewDefaults;
 
         before(function () {
@@ -824,13 +824,13 @@ describe('When using .defaults', function () {
                     should(stub.callCount).be.eql(2);
                 });
         });
-        it('Should not retry on 5xx', function () {
+        it('Should retry on 5xx', function () {
             stub.resolves(STRING_RESPONSE_500);
 
             return requestWithNewDefaults.get(URI)
                 .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
                 .then(() => {
-                    should(stub.callCount).be.eql(1);
+                    should(stub.callCount).be.eql(2);
                 });
         });
     });
