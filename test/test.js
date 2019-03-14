@@ -1,6 +1,5 @@
 const rp = require('request-promise-native');
-const StatusCodeError = require('../errors/StatusCodeError');
-const RequestError = require('../errors/RequestError');
+const StatusCodeError = require('../lib/errors/StatusCodeError');
 const sinon = require('sinon');
 const should = require('should');
 const nock = require('nock');
@@ -30,7 +29,7 @@ describe('Validation checks', function () {
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -70,7 +69,7 @@ describe('When calling the exported object directly', function () {
     before(function () {
         getStub = sandbox.stub(rp, 'get').resolves(GOOD_RESPONSE);
         putStub = sandbox.stub(rp, 'put').resolves(GOOD_RESPONSE);
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         sandbox.restore();
@@ -126,7 +125,7 @@ describe('When calling a method', function () {
     let request;
     before(function () {
         postStub = sandbox.stub(rp, 'post').resolves(GOOD_RESPONSE);
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         sandbox.restore();
@@ -192,7 +191,7 @@ describe('When calling a method and passing another method in options', function
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -216,7 +215,7 @@ describe('When sending get request with default values', function () {
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -259,7 +258,7 @@ describe('When sending get request with max value set', function () {
     before(function () {
         sandbox = sinon.createSandbox();
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -310,7 +309,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -344,7 +343,7 @@ describe('When sending request with the default max value and retryOn5xx set to 
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -398,7 +397,7 @@ describe('When sending get request with max value set to 3 and retryOn5xx set to
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -452,7 +451,7 @@ describe('When sending get request with retryOn5xx set to true and simple set to
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -505,7 +504,7 @@ describe('When setting resolveWithFullResponse=false', function () {
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -555,7 +554,7 @@ describe('When setting resolveWithFullResponse=true', function () {
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -601,7 +600,7 @@ describe('When passing all options as the first argument', function () {
     let request;
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -668,7 +667,7 @@ describe('When sending get request with max value set and retryStrategy given', 
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -736,7 +735,7 @@ describe('When sending request with onSuccess and onError', function () {
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -823,7 +822,7 @@ describe('When throwing an error', function () {
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         stub.restore();
@@ -885,7 +884,7 @@ describe('When using .defaults', function () {
 
     before(function () {
         stub = sandbox.stub(rp, 'get');
-        requestWithDefaults = require('../index').defaults(options);
+        requestWithDefaults = require('../lib/index').defaults(options);
     });
     after(function () {
         stub.restore();
@@ -992,7 +991,7 @@ describe('On request errors', function () {
     before(function () {
         getSpy = sandbox.spy(rp, 'get');
         postSpy = sandbox.spy(rp, 'post');
-        request = require('../index');
+        request = require('../lib/index');
     });
     after(function () {
         sandbox.restore();
