@@ -1,6 +1,7 @@
 [![NPM Version][npm-image]][npm-url]
 [![Build Status][travis-image]][travis-url]
 [![Test Coverage][coveralls-image]][coveralls-url]
+[![Known Vulnerabilities][snyk-image]][snyk-url]
 [![NPM Downloads][downloads-image]][downloads-url]
 <!-- [![Maintainability][codeclimate-maintainability-image]][codeclimate-maintainability-url] -->
 <!-- [![Test Coverage][codeclimate-coverage-image]][codeclimate-coverage-url] -->
@@ -176,3 +177,5 @@ requestWithDefaults.get('http://www.site-with-issues.com').then...
 [downloads-image]: http://img.shields.io/npm/dm/requestxn.svg?style=flat
 [downloads-url]: https://npmjs.org/package/requestxn
 [npm-stats]: https://nodei.co/npm/requestxn/
+[snyk-image]: https://snyk.io/test/github/Zooz/api-schema-validator/badge.svg?targetFile=package.json
+[snyk-url]: https://snyk.io/test/github/Zooz/api-schema-validator?targetFile=package.json
