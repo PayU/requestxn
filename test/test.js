@@ -3,6 +3,7 @@ const StatusCodeError = require('../lib/errors/StatusCodeError');
 const sinon = require('sinon');
 const should = require('should');
 const nock = require('nock');
+const rewire = require('rewire');
 
 const URI = 'http://www.google.com';
 const GOOD_RESPONSE = {
@@ -1083,6 +1084,56 @@ describe('On request errors', function () {
             .then(() => {
                 should(postSpy.callCount).be.eql(3);
                 should(server.pendingMocks()).have.lengthOf(0);
+            });
+    });
+});
+
+describe('When using verbs that does not supported in request promise native', function () {
+    const sandbox = sinon.createSandbox();
+    let request;
+    let newRp;
+    before(function () {
+        request = rewire('../lib/index');
+        newRp = sandbox.stub();
+    });
+    after(function () {
+        sandbox.restore();
+    });
+    afterEach(function () {
+        sandbox.resetHistory();
+        nock.cleanAll();
+    });
+
+    it('Should use the called method', function () {
+        newRp.resolves(GOOD_RESPONSE);
+        request.__set__('rp', newRp);
+
+        return request.list({ uri: URI })
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
+            .then(() => {
+                should(newRp.callCount).be.eql(1);
+            });
+    });
+
+    it('Should retry in case of failing', function () {
+        newRp.resolves(STRING_RESPONSE_500);
+        request.__set__('rp', newRp);
+
+        return request.list({ uri: URI })
+            .should.be.rejectedWith(new StatusCodeError(STRING_RESPONSE_500))
+            .then(() => {
+                should(newRp.callCount).be.eql(1);
+            });
+    });
+
+    it('Should use the options` method', function () {
+        newRp.resolves(GOOD_RESPONSE);
+        request.__set__('rp', newRp);
+
+        return request({ uri: URI, method: 'list' })
+            .should.be.fulfilledWith(GOOD_RESPONSE.body)
+            .then(() => {
+                should(newRp.callCount).be.eql(1);
             });
     });
 });
