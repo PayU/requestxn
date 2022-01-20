@@ -17,9 +17,10 @@
     "all": true
   },
   "scripts": {
-    "test": "mocha --timeout 4000 test/test.js",
-    "test-travis": "nyc npm test",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls"
+    "test": "npx mocha --timeout 4000 test/test.js",
+    "test-travis": "npx nyc npm test",
+    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
+    "lint": "npx eslint 'lib/**/*.js'"
   },
   "keywords": [
     "request",
@@ -30,23 +31,23 @@
   "author": "Kobi Carmeli",
   "license": "Apache-2.0",
   "dependencies": {
-    "request": "^2.88.0",
-    "request-promise-native": "^1.0.7"
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.9"
   },
   "devDependencies": {
-    "coveralls": "^3.0.3",
-    "eslint": "^5.15.1",
-    "eslint-config-standard": "^12.0.0",
-    "eslint-plugin-import": "^2.16.0",
-    "eslint-plugin-node": "^8.0.1",
-    "eslint-plugin-promise": "^4.0.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "mocha": "^6.1.4",
+    "coveralls": "^3.1.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^6.0.0",
+    "eslint-plugin-standard": "^5.0.0",
+    "mocha": "^9.1.4",
     "nock": "^10.0.6",
-    "nyc": "^14.1.1",
-    "rewire": "^4.0.1",
+    "nyc": "^15.1.0",
+    "rewire": "^6.0.0",
     "should": "^13.2.3",
-    "sinon": "^7.2.7"
+    "sinon": "^7.5.0"
   },
   "files": [
     "lib"
