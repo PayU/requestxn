@@ -3,7 +3,9 @@
         "mocha": true,
         "node": true
     },
-    "extends": "standard",
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
     "rules": {
         "eol-last": "off",
         "space-before-function-paren": "off",
